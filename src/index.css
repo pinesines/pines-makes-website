@@ -26,7 +26,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 100;
-  opacity: 0.045;
+  opacity: 0.06;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
 }
 
@@ -40,7 +40,84 @@
 .hero-headline {
   text-shadow:
     3px 3px 0 rgb(13 158 144 / 0.35),
-    -2px -2px 0 rgb(255 122 26 / 0.25);
+    -2px -2px 0 rgb(255 122 26 / 0.25),
+    0 10px 28px rgb(60 40 45 / 0.12);
+}
+
+/** Logo-adjacent: soft inflated / sticker-like type */
+.blob-type {
+  text-shadow:
+    2px 2px 0 rgb(255 255 255 / 0.55),
+    3px 7px 0 rgb(55 40 48 / 0.08),
+    -1px -1px 0 rgb(255 255 255 / 0.4);
+}
+
+/** Irregular chunky radii — pair with rotate-* for variety */
+.blob-squish-1 {
+  border-radius: 58% 42% 52% 48% / 48% 52% 55% 45%;
+}
+.blob-squish-2 {
+  border-radius: 42% 58% 38% 62% / 55% 42% 58% 45%;
+}
+.blob-squish-3 {
+  border-radius: 52% 48% 58% 42% / 44% 52% 48% 56%;
+}
+.blob-squish-4 {
+  border-radius: 48% 52% 45% 55% / 62% 38% 52% 48%;
+}
+
+/** Very irregular amoeba — for gallery cards that should feel hand-cut */
+.blob-amoeba {
+  border-radius: 62% 38% 46% 54% / 55% 48% 52% 45%;
+  clip-path: none;
+}
+
+/** Lime green panel color (Mystery Machine secondary body) */
+.bg-mm-lime {
+  background-color: #8bc34a;
+}
+
+/** Subtle top highlight + depth — reads “puffy” like the logo fill */
+.blob-inflate {
+  box-shadow:
+    inset 0 3px 14px rgb(255 255 255 / 0.55),
+    inset 0 -16px 28px rgb(55 40 48 / 0.06),
+    0 18px 42px -16px rgb(55 40 50 / 0.22);
+}
+
+.blob-inflate-sm {
+  box-shadow:
+    inset 0 2px 10px rgb(255 255 255 / 0.45),
+    inset 0 -8px 18px rgb(55 40 48 / 0.05),
+    0 12px 32px -14px rgb(55 40 50 / 0.18);
+}
+
+/** Bouncy paint-splat wobble — gentle perpetual squish */
+@keyframes splat-wobble-kf {
+  0%, 100% { transform: scale(1, 1) rotate(0deg); }
+  25%      { transform: scale(1.05, 0.94) rotate(-1.2deg); }
+  50%      { transform: scale(0.96, 1.06) rotate(0.8deg); }
+  75%      { transform: scale(1.03, 0.98) rotate(1.4deg); }
+}
+
+.splat-wobble {
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+  animation: splat-wobble-kf 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+/** Stagger variants so simultaneous splats don't pulse in sync */
+.splat-wobble-fast {
+  animation-duration: 6.5s;
+  animation-delay: -2s;
+}
+.splat-wobble-slow {
+  animation-duration: 12s;
+  animation-delay: -4s;
+}
+.splat-wobble-offset {
+  animation-delay: -3.5s;
 }
 
 body {

@@ -23,16 +23,101 @@ function WaveDivider({ className, flip }: { className?: string; flip?: boolean }
   );
 }
 
-/** Sparse cloud accent — not for every card */
-function CloudPuff({ className }: { className?: string }) {
+/** Paint-splat blob with droplets — bouncy, expressive background wash */
+function CloudPuff({ className, wobble = '' }: { className?: string; wobble?: '' | 'fast' | 'slow' | 'offset' }) {
+  const wobbleClass = wobble ? `splat-wobble splat-wobble-${wobble}` : 'splat-wobble';
   return (
     <svg
       className={className}
-      viewBox="0 0 520 180"
+      viewBox="0 0 640 320"
       fill="currentColor"
       aria-hidden
     >
-      <path d="M 95 130 Q 55 132 48 95 Q 42 68 72 52 Q 82 22 118 26 Q 138 8 178 14 Q 210 4 248 18 Q 286 8 322 24 Q 352 18 382 32 Q 418 28 448 48 Q 478 44 498 72 Q 514 88 502 118 Q 508 142 482 152 Q 458 168 422 160 Q 392 174 352 166 Q 318 176 278 162 Q 238 172 198 158 Q 162 168 128 152 Q 100 150 95 130 Z" />
+      <g className={wobbleClass}>
+        {/* Main splat body with spiky drips */}
+        <path d="M 90 175 C 35 165 -5 110 30 70 C 60 35 130 55 130 25 C 155 -5 205 -10 220 30 C 240 -5 290 0 290 30 C 320 40 330 -5 380 15 C 410 -15 445 0 445 30 C 470 40 510 -5 540 40 C 590 50 605 95 575 110 C 620 125 640 165 595 195 C 645 215 605 250 575 250 C 555 285 505 260 480 285 C 505 325 435 320 420 285 C 400 300 375 270 360 290 C 340 325 305 310 285 280 C 265 295 240 315 215 280 C 195 315 160 295 145 275 C 115 290 85 300 60 270 C 35 295 -5 270 30 225 C -5 215 -15 175 25 165 C 40 155 75 170 90 175 Z" />
+        {/* Satellite paint droplets */}
+        <ellipse cx="30" cy="270" rx="14" ry="10" />
+        <circle cx="12" cy="295" r="6" />
+        <ellipse cx="605" cy="105" rx="11" ry="8" />
+        <circle cx="630" cy="82" r="5" />
+        <ellipse cx="455" cy="305" rx="9" ry="5" />
+        <circle cx="320" cy="312" r="8" />
+        <circle cx="180" cy="315" r="6" />
+        <circle cx="595" cy="285" r="7" />
+      </g>
+    </svg>
+  );
+}
+
+/** Looping marquee row used as the hero centerpiece */
+function HeroMarqueeRow({
+  text,
+  textClassName,
+  duration,
+  reverse = false,
+  flowerColors,
+}: {
+  text: string;
+  textClassName: string;
+  duration: number;
+  reverse?: boolean;
+  flowerColors?: { petal: string; petalAlt: string; center: string };
+}) {
+  const repeats = Array.from({ length: 8 });
+  return (
+    <motion.div
+      animate={{ x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] }}
+      transition={{ duration, repeat: Infinity, ease: 'linear' }}
+      className="flex w-max shrink-0 items-center gap-10 whitespace-nowrap md:gap-16"
+      aria-hidden
+    >
+      {[...repeats, ...repeats].map((_, i) => (
+        <React.Fragment key={i}>
+          <span className={textClassName}>{text}</span>
+          <FlowerDecal
+            className="shrink-0 h-10 w-10 md:h-16 md:w-16"
+            colors={flowerColors}
+          />
+        </React.Fragment>
+      ))}
+    </motion.div>
+  );
+}
+
+/** Single organic petal (curved teardrop), tip toward -Y; rotates around 100,100 */
+const FLOWER_PETAL_D =
+  'M 100 12 C 138 22 142 62 128 86 C 118 102 106 112 100 116 C 94 112 82 102 72 86 C 58 62 62 22 100 12 Z';
+
+/** Mystery Machine-style daisy flower decal */
+function FlowerDecal({
+  className,
+  colors,
+}: {
+  className?: string;
+  colors?: { petal: string; petalAlt: string; center: string };
+}) {
+  const petal = colors?.petal ?? '#ff7a1a';
+  const petalAlt = colors?.petalAlt ?? '#ffdd2e';
+  const center = colors?.center ?? '#ff7a1a';
+
+  return (
+    <svg className={className} viewBox="0 0 200 200" aria-hidden>
+      <motion.g
+        animate={{ rotate: 360 }}
+        transition={{ duration: 200, repeat: Infinity, ease: 'linear' }}
+        style={{ transformOrigin: '100px 100px' }}
+      >
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
+          <path
+            key={deg}
+            d={FLOWER_PETAL_D}
+            fill={i % 2 === 0 ? petal : petalAlt}
+            transform={`rotate(${deg} 100 100)`}
+          />
+        ))}
+        <circle cx="100" cy="100" r="24" fill={center} />
+      </motion.g>
     </svg>
   );
 }
@@ -42,22 +127,22 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
-      <div className="max-w-7xl mx-auto flex h-[4.5rem] items-center justify-between rounded-[1.75rem] border border-tuft-magenta/15 bg-white/75 px-6 shadow-[0_12px_40px_-12px_rgb(60_40_50_0.12),0_4px_20px_-8px_rgb(60_40_50_0.08)] backdrop-blur-md md:px-8">
-        <div className="font-retro text-2xl tracking-wide text-tuft-magenta logo-decal md:text-3xl">
-          PINES MAKES
-        </div>
+      <div className="max-w-7xl mx-auto flex h-[4.5rem] items-center justify-between rounded-[1.75rem] border-2 border-tuft-orange/40 bg-tuft-yellow/90 px-6 shadow-[0_12px_40px_-12px_rgb(60_40_50_0.18),0_4px_20px_-8px_rgb(60_40_50_0.10)] backdrop-blur-md md:px-8">
+        <a href="#" className="font-sans text-sm font-semibold tracking-wide text-stone-900 transition-colors hover:text-tuft-teal">
+          Home
+        </a>
 
         <div className="hidden items-center gap-10 font-sans text-sm font-semibold tracking-wide md:flex">
-          <a href="#" className="transition-colors hover:text-tuft-teal">
+          <a href="#" className="text-stone-900 transition-colors hover:text-tuft-teal">
             GALLERY
           </a>
-          <a href="#" className="transition-colors hover:text-tuft-teal">
+          <a href="#" className="text-stone-900 transition-colors hover:text-tuft-teal">
             PROCESS
           </a>
           <button
             type="button"
             onClick={onContactClick}
-            className="cursor-pointer rounded-full border-2 border-tuft-teal/30 bg-tuft-yellow px-7 py-2.5 font-sans shadow-[0_6px_20px_-4px_rgb(225_29_116_0.2)] transition-all hover:border-tuft-orange/50 hover:shadow-lg active:scale-[0.98]"
+            className="blob-inflate cursor-pointer rounded-full border-2 border-tuft-orange/60 bg-tuft-orange px-7 py-2.5 font-sans font-bold text-white shadow-[0_6px_20px_-4px_rgb(255_122_26_0.5)] transition-all hover:bg-tuft-magenta hover:border-tuft-magenta active:scale-[0.98]"
           >
             ORDER CUSTOM
           </button>
@@ -81,9 +166,12 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute top-[calc(100%+0.5rem)] right-4 left-4 mx-auto max-w-7xl rounded-[1.75rem] border border-stone-100 bg-white p-8 shadow-[0_24px_50px_-20px_rgb(45_30_40_0.18)] md:hidden"
+            className="absolute top-[calc(100%+0.5rem)] right-4 left-4 mx-auto max-w-7xl rounded-[1.75rem] border-2 border-tuft-orange/30 bg-tuft-yellow/95 p-8 shadow-[0_24px_50px_-20px_rgb(45_30_40_0.22)] md:hidden"
           >
             <div className="flex flex-col gap-6">
+              <a href="#" onClick={() => setIsOpen(false)} className="font-retro text-2xl text-tuft-teal">
+                Home
+              </a>
               <a href="#" onClick={() => setIsOpen(false)} className="font-retro text-2xl text-tuft-teal">
                 GALLERY
               </a>
@@ -96,7 +184,7 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
                   onContactClick();
                   setIsOpen(false);
                 }}
-                className="w-full cursor-pointer rounded-[1.25rem] bg-tuft-magenta py-4 font-retro text-lg text-white shadow-[0_10px_30px_-8px_rgb(225_29_116_0.45)]"
+                className="blob-inflate w-full cursor-pointer rounded-[1.25rem] bg-tuft-orange py-4 font-retro text-lg text-white shadow-[0_10px_30px_-8px_rgb(255_122_26_0.5)] transition-all hover:bg-tuft-magenta"
               >
                 CONTACT ME
               </button>
@@ -110,64 +198,114 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
 
 const Hero = () => {
   return (
-    <section className="relative overflow-hidden pt-36 pb-12 px-6">
-      <CloudPuff className="pointer-events-none absolute -left-32 top-24 w-[420px] text-tuft-lilac/20 md:w-[520px]" />
-      <CloudPuff className="pointer-events-none absolute -right-20 bottom-32 w-[320px] rotate-12 text-tuft-lime/25 md:w-[400px]" />
+    <section className="relative overflow-hidden pt-32 pb-12">
+      {/* Vivid van-body color panels */}
+      <CloudPuff wobble="slow" className="pointer-events-none absolute -left-40 top-16 w-[480px] text-tuft-lime/40 md:w-[580px]" />
+      <CloudPuff wobble="fast" className="pointer-events-none absolute -right-24 top-28 w-[420px] -scale-x-100 text-tuft-teal/35 md:w-[520px]" />
+      <CloudPuff wobble="offset" className="pointer-events-none absolute -right-16 bottom-8 w-[360px] rotate-12 text-tuft-yellow/50 md:w-[440px]" />
+      {/* Flower decals */}
+      <FlowerDecal className="pointer-events-none absolute right-[8%] top-20 w-28 opacity-70 md:w-36" />
+      <FlowerDecal className="pointer-events-none absolute left-[12%] bottom-12 w-20 opacity-50 rotate-12 md:w-28" />
 
-      <div className="relative z-[1] mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-2">
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="mb-6 inline-block rounded-full bg-tuft-orange/15 px-5 py-2 font-sans text-xs font-bold tracking-widest text-tuft-orange ring-2 ring-tuft-orange/25">
-            HANDMADE WITH LOVE
-          </div>
-          <h1 className="hero-headline mb-8 font-retro text-5xl leading-[0.95] text-stone-900 md:text-7xl lg:text-8xl">
-            Soft textures for{' '}
-            <span className="text-tuft-magenta">happy</span> walls.
-          </h1>
-          <p className="mb-10 max-w-md font-sans text-lg leading-relaxed text-stone-600">
-            Unique tufted wall hangings designed to bring warmth, color, and a touch of groovy retro
-            whimsy to your space.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <button
-              type="button"
-              className="group flex cursor-pointer items-center gap-2 rounded-full bg-tuft-teal px-9 py-4 font-sans text-base font-bold text-white shadow-[0_12px_36px_-10px_rgb(13_158_144_0.55)] transition-all hover:brightness-110 active:scale-[0.98]"
-            >
-              View Collection
-              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-            </button>
-          </div>
-        </motion.div>
+      {/* DRAMATIC HERO MARQUEE STACK */}
+      <motion.div
+        initial={{ opacity: 0, y: -24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-[1] mb-10 flex flex-col gap-1 md:mb-16 md:gap-3"
+      >
+        <div className="-rotate-1">
+          <HeroMarqueeRow
+            text="PINES MAKES"
+            textClassName="hero-headline font-retro uppercase text-tuft-magenta text-6xl md:text-8xl lg:text-[10rem] leading-[0.95]"
+            duration={190}
+            flowerColors={{ petal: '#ff7a1a', petalAlt: '#ffdd2e', center: '#e11d74' }}
+          />
+        </div>
+        <div className="rotate-[1.2deg]">
+          <HeroMarqueeRow
+            text="PINES MAKES"
+            textClassName="hero-headline font-retro uppercase text-tuft-orange text-5xl md:text-7xl lg:text-[8.5rem] leading-[0.95]"
+            duration={130}
+            reverse
+            flowerColors={{ petal: '#0d9e90', petalAlt: '#c4f000', center: '#ff7a1a' }}
+          />
+        </div>
+        <div className="-rotate-[0.5deg]">
+          <HeroMarqueeRow
+            text="PINES MAKES"
+            textClassName="hero-headline font-retro uppercase text-tuft-teal text-5xl md:text-7xl lg:text-[9rem] leading-[0.95]"
+            duration={160}
+            flowerColors={{ petal: '#e11d74', petalAlt: '#ffdd2e', center: '#0d9e90' }}
+          />
+        </div>
+        <div className="rotate-[0.8deg]">
+          <HeroMarqueeRow
+            text="PINES MAKES"
+            textClassName="hero-headline font-retro uppercase text-tuft-lilac text-4xl md:text-6xl lg:text-[7.5rem] leading-[0.95]"
+            duration={110}
+            reverse
+            flowerColors={{ petal: '#ffdd2e', petalAlt: '#ff7a1a', center: '#9d6bff' }}
+          />
+        </div>
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
-          className="relative mx-auto aspect-square w-full max-w-lg"
-        >
-          <div
-            className="absolute -inset-3 -z-20 rotate-6 bg-tuft-yellow/50"
-            style={{ borderRadius: '58% 42% 48% 52% / 52% 45% 55% 48%' }}
-          />
-          <div
-            className="absolute -inset-2 -z-10 -rotate-6 bg-tuft-lilac/25"
-            style={{ borderRadius: '45% 55% 62% 38% / 40% 55% 45% 60%' }}
-          />
-          <div
-            className="relative h-full w-full overflow-hidden shadow-[0_28px_60px_-20px_rgb(45_30_50_0.22),0_12px_24px_-12px_rgb(45_30_50_0.12)] ring-4 ring-white/80"
-            style={{ borderRadius: '46% 54% 52% 48% / 44% 48% 52% 56%' }}
+      <div className="relative z-[1] mx-auto max-w-7xl px-6">
+        <div className="grid items-center gap-16 lg:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <img
-              src="/IMG_0572%20copy.jpg"
-              alt="Tufted Wall Art"
-              className="h-full w-full object-cover"
-              id="hero-image"
+            <div className="blob-inflate mb-6 inline-block rounded-full bg-tuft-orange px-5 py-2 font-sans text-xs font-bold tracking-widest text-white">
+              HANDMADE WITH LOVE
+            </div>
+            <h1 className="hero-headline mb-8 font-retro text-5xl leading-[0.95] text-stone-900 md:text-7xl lg:text-8xl">
+              Soft textures for{' '}
+              <span className="text-tuft-magenta">happy</span> walls.
+            </h1>
+            <p className="mb-10 max-w-md font-sans text-lg leading-relaxed text-stone-600">
+              Unique tufted wall hangings designed to bring warmth, color, and a touch of groovy retro
+              whimsy to your space.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <button
+                type="button"
+                className="blob-inflate group flex cursor-pointer items-center gap-2 rounded-full bg-tuft-teal px-9 py-4 font-sans text-base font-bold text-white transition-all hover:brightness-110 active:scale-[0.98]"
+              >
+                View Collection
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
+            className="relative mx-auto aspect-square w-full max-w-lg"
+          >
+            <div
+              className="absolute -inset-3 -z-20 rotate-6 bg-tuft-yellow/50"
+              style={{ borderRadius: '58% 42% 48% 52% / 52% 45% 55% 48%' }}
             />
-          </div>
-        </motion.div>
+            <div
+              className="absolute -inset-2 -z-10 -rotate-6 bg-tuft-lilac/25"
+              style={{ borderRadius: '45% 55% 62% 38% / 40% 55% 45% 60%' }}
+            />
+            <div
+              className="relative h-full w-full overflow-hidden shadow-[0_28px_60px_-20px_rgb(45_30_50_0.22),0_12px_24px_-12px_rgb(45_30_50_0.12)] ring-4 ring-white/80"
+              style={{ borderRadius: '46% 54% 52% 48% / 44% 48% 52% 56%' }}
+            >
+              <img
+                src="/cheece-rug-1.jpg"
+                alt="Tufted wall art"
+                className="h-full w-full object-cover"
+                id="hero-image"
+              />
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -183,18 +321,19 @@ function HeroToGalleryWave() {
 }
 
 const galleryItems = [
-  { id: 1, title: 'Pastel Dream', accent: 'ring-tuft-yellow/40', img: '/IMG_0463%20copy%20(1).jpg' },
-  { id: 2, title: 'Soft Waves', accent: 'ring-tuft-magenta/35', img: '/IMG_0502%20copy.jpg' },
-  { id: 3, title: 'Retro Bloom', accent: 'ring-tuft-lilac/40', img: '/IMG_0528%20(1)%20copy.jpg' },
-  { id: 4, title: 'Sunset Tuft', accent: 'ring-tuft-orange/35', img: '/IMG_0608%20copy.jpg' },
-  { id: 5, title: 'Azure Flow', accent: 'ring-tuft-teal/35', img: '/IMG_0612%20copy.jpg' },
+  { id: 1, title: 'Pastel Dream', accent: 'ring-tuft-yellow/60', blob: 'blob-squish-1', img: '/rug-1.jpg' },
+  { id: 2, title: 'Soft Waves', accent: 'ring-tuft-magenta/50', blob: 'blob-squish-2', img: '/rug-2.jpg' },
+  { id: 3, title: 'Retro Bloom', accent: 'ring-tuft-orange/50', blob: 'blob-squish-3', img: '/rug-3.jpg' },
+  { id: 4, title: 'Sunset Tuft', accent: 'ring-tuft-teal/50', blob: 'blob-squish-4', img: '/rug-4.jpg' },
+  { id: 5, title: 'Azure Flow', accent: 'ring-tuft-lime/50', blob: 'blob-squish-1', img: '/rug-5.jpg' },
 ];
 
 const Gallery = () => {
   return (
-    <section className="shrink-0 bg-white">
+    <section className="shrink-0 bg-soft-bg">
       <div className="relative px-6 pb-24 pt-6">
-        <CloudPuff className="pointer-events-none absolute right-[8%] top-12 hidden w-[200px] text-tuft-teal/12 lg:block" />
+        <CloudPuff wobble="slow" className="pointer-events-none absolute right-[5%] top-8 hidden w-[260px] text-tuft-teal/30 lg:block" />
+        <FlowerDecal className="pointer-events-none absolute left-[3%] top-10 hidden w-24 opacity-60 lg:block" />
 
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row md:items-end">
@@ -204,7 +343,7 @@ const Gallery = () => {
                 Every piece is slow-made, ensuring the highest quality texture and detail.
               </p>
             </div>
-            <div className="inline-flex items-center rounded-full bg-tuft-yellow/35 px-6 py-3 font-sans text-xs font-bold tracking-widest text-stone-700 ring-2 ring-tuft-orange/20">
+            <div className="blob-inflate inline-flex items-center rounded-full bg-tuft-orange px-6 py-3 font-sans text-xs font-bold tracking-widest text-white">
               EST. 2024
             </div>
           </div>
@@ -220,7 +359,7 @@ const Gallery = () => {
                 className="group cursor-pointer"
               >
                 <div
-                  className={`relative mb-6 aspect-[4/5] overflow-hidden rounded-[2.75rem] ring-4 ${item.accent} shadow-[0_20px_50px_-24px_rgb(55_40_60_0.2),0_8px_20px_-12px_rgb(55_40_60_0.1)] transition-shadow duration-500 group-hover:shadow-[0_28px_64px_-20px_rgb(55_40_60_0.28)]`}
+                  className={`blob-inflate relative mb-6 aspect-[4/5] overflow-hidden ring-4 ${item.blob} ${item.accent} transition-shadow duration-500`}
                 >
                   <img
                     src={item.img}
@@ -252,7 +391,9 @@ const Contact = ({ id }: { id: string }) => {
       id={id}
       className="relative overflow-hidden bg-gradient-to-b from-tuft-yellow/40 via-tuft-yellow/20 to-soft-bg px-6 py-28"
     >
-      <CloudPuff className="pointer-events-none absolute -left-24 bottom-20 w-[280px] text-tuft-orange/15" />
+      <CloudPuff wobble="offset" className="pointer-events-none absolute -left-24 bottom-20 w-[380px] text-tuft-orange/30" />
+      <CloudPuff wobble="fast" className="pointer-events-none absolute -right-20 top-16 w-[320px] -scale-x-100 text-tuft-lime/35" />
+      <FlowerDecal className="pointer-events-none absolute right-[8%] bottom-16 w-24 opacity-60" />
 
       <div className="relative z-[1] mx-auto max-w-3xl text-center">
         <motion.div
@@ -268,31 +409,33 @@ const Contact = ({ id }: { id: string }) => {
           </p>
 
           <div className="mb-16 grid gap-6 font-sans md:grid-cols-2">
-            <div className="rounded-[2rem] bg-white p-8 shadow-[0_16px_40px_-20px_rgb(55_40_60_0.12),inset_0_1px_0_0_rgb(255_255_255_0.9)] transition-shadow hover:shadow-[0_20px_48px_-18px_rgb(55_40_60_0.16)]">
-              <Instagram className="mx-auto mb-4 text-tuft-magenta" size={32} />
+            <div className="blob-inflate blob-squish-2 rounded-[2rem] bg-tuft-yellow p-8 transition-transform hover:scale-[1.02]">
+              <Instagram className="mx-auto mb-4 text-tuft-orange" size={32} />
               <h4 className="mb-2 font-retro text-xl text-stone-900">Instagram</h4>
-              <p className="mb-4 text-sm text-stone-500">DM for commissions</p>
+              <p className="mb-4 text-sm text-stone-700">DM for commissions</p>
               <a
-                href="#"
+                href="https://instagram.com/pinesmakes"
+                target="_blank"
+                rel="noreferrer"
                 className="text-xs font-bold tracking-widest text-tuft-teal uppercase hover:underline"
               >
-                @softtuft.studio
+                @pinesmakes
               </a>
             </div>
-            <div className="rounded-[2rem] bg-white p-8 shadow-[0_16px_40px_-20px_rgb(55_40_60_0.12),inset_0_1px_0_0_rgb(255_255_255_0.9)] transition-shadow hover:shadow-[0_20px_48px_-18px_rgb(55_40_60_0.16)]">
-              <Mail className="mx-auto mb-4 text-tuft-magenta" size={32} />
+            <div className="blob-inflate blob-squish-3 rounded-[2rem] bg-tuft-lime/60 p-8 transition-transform hover:scale-[1.02]">
+              <Mail className="mx-auto mb-4 text-tuft-teal" size={32} />
               <h4 className="mb-2 font-retro text-xl text-stone-900">Email</h4>
-              <p className="mb-4 text-sm text-stone-500">Let&apos;s chat about art</p>
+              <p className="mb-4 text-sm text-stone-700">Let&apos;s chat about art</p>
               <a
-                href="#"
+                href="mailto:pinesmakes@gmail.com"
                 className="text-xs font-bold tracking-widest text-tuft-teal uppercase hover:underline"
               >
-                hello@softtuft.art
+                pinesmakes@gmail.com
               </a>
             </div>
           </div>
 
-          <form className="rounded-[2.75rem] border-2 border-tuft-lilac/15 bg-white p-10 text-left shadow-[0_24px_56px_-24px_rgb(45_35_55_0.18),inset_0_1px_0_0_rgb(255_255_255_0.95)]">
+          <form className="rounded-[2.75rem] border-2 border-tuft-orange/30 bg-white p-10 text-left shadow-[0_24px_56px_-24px_rgb(45_35_55_0.18),inset_0_1px_0_0_rgb(255_255_255_0.95)]">
             <div className="mb-6 grid gap-6 font-sans md:grid-cols-2">
               <div className="space-y-2">
                 <label htmlFor="name-input" className="px-1 text-xs font-bold tracking-widest text-stone-500 uppercase">
@@ -330,7 +473,7 @@ const Contact = ({ id }: { id: string }) => {
             </div>
             <button
               type="submit"
-              className="w-full cursor-pointer rounded-[1.75rem] bg-tuft-magenta py-5 font-retro text-xl text-white shadow-[0_14px_36px_-10px_rgb(225_29_116_0.45)] transition-all hover:brightness-105 active:scale-[0.98]"
+              className="blob-inflate w-full cursor-pointer rounded-[1.75rem] bg-tuft-magenta py-5 font-retro text-xl text-white transition-all hover:brightness-105 active:scale-[0.98]"
             >
               Send Message
             </button>
@@ -359,7 +502,7 @@ export default function App() {
         <section className="relative overflow-hidden bg-tuft-teal px-6 py-24 text-center">
           <motion.div
             animate={{ x: [-1200, 0] }}
-            transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 130, repeat: Infinity, ease: 'linear' }}
             className="pointer-events-none flex gap-24 whitespace-nowrap opacity-[0.12]"
           >
             {[...Array(12)].map((_, i) => (
@@ -368,18 +511,20 @@ export default function App() {
               </span>
             ))}
           </motion.div>
+          {/* Flower accents */}
+          <FlowerDecal className="pointer-events-none absolute left-[3%] top-1/2 w-24 -translate-y-1/2 opacity-50 md:w-32" />
+          <FlowerDecal className="pointer-events-none absolute right-[3%] top-1/2 w-24 -translate-y-1/2 rotate-45 opacity-50 md:w-32" />
+          <CloudPuff wobble="slow" className="pointer-events-none absolute -bottom-8 left-1/2 w-[340px] -translate-x-1/2 text-tuft-lime/20" />
           <div className="relative z-10 mx-auto max-w-4xl py-10">
             <h2 className="mb-8 font-retro text-4xl leading-tight text-white md:text-6xl">
               Bringing{' '}
-              <span className="text-tuft-yellow underline decoration-tuft-orange decoration-wavy underline-offset-[0.35em]">
-                personality
-              </span>{' '}
+              <span className="text-tuft-yellow">personality</span>{' '}
               to every stitch.
             </h2>
             <button
               type="button"
               onClick={scrollToContact}
-              className="cursor-pointer rounded-full bg-tuft-orange px-10 py-5 font-retro text-xl text-white shadow-[0_16px_40px_-12px_rgb(255_122_26_0.55)] transition-all hover:bg-tuft-lime hover:text-stone-900"
+              className="blob-inflate cursor-pointer rounded-full bg-tuft-orange px-10 py-5 font-retro text-xl text-white shadow-[0_16px_40px_-12px_rgb(255_122_26_0.55)] transition-all hover:bg-tuft-yellow hover:text-stone-900 active:scale-[0.98]"
             >
               Start a Commission
             </button>
@@ -392,7 +537,13 @@ export default function App() {
       </main>
 
       <footer className="relative z-[1] mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border-t border-tuft-magenta/10 px-6 py-12 text-sm text-stone-500 font-sans md:flex-row">
-        <div className="font-retro text-2xl text-tuft-magenta logo-decal">PINES MAKES</div>
+        <img
+          src="/font-2.png"
+          alt="Pines Makes"
+          className="h-10 w-auto object-contain md:h-11"
+          width={1024}
+          height={1024}
+        />
         <div className="flex gap-8 text-xs font-bold tracking-widest uppercase">
           <a href="#" className="transition-colors hover:text-tuft-teal">
             Privacy
