@@ -31,14 +31,13 @@ Ines is the founder and creator of Pines Ines. She is an artist with limited cod
 When Ines wants changes **live on GitHub Pages**, follow this sequence from the repo root. **Pushing to `main` triggers the repo’s GitHub Actions workflow for Pages**, which publishes the updated site to **[https://pinesines.github.io/pines-makes-website](https://pinesines.github.io/pines-makes-website)** (after the workflow finishes—usually within a minute or two).
 
 1. **Build:** `make build` — refreshes `docs/` and bundled assets.
-2. **Or one step for git:** `make deploy` — runs `git add .`, commits with UTC ISO timestamp (`date -u +'%Y-%m-%dT%H:%M:%SZ'`), and `git push origin main`.
+2. **Stage, commit, and push:** `make deploy` — runs `git add .`, commits with a UTC ISO timestamp message (`date -u +'%Y-%m-%dT%H:%M:%SZ'`), and `git push origin main` (this triggers the GitHub Pages deployment via Actions).
 
    **Manual equivalents** (same as `make deploy`):
 
-3. **Stage:** `git add .`
-4. **Commit with a timestamp message** (UTC is fine and sortable), for example:
+   - `git add .`
    - `git commit -m "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"`
-5. **Push to `main`:** `git push origin main` — this is the step that kicks off GitHub Pages deployment via Actions.
+   - `git push origin main`
 
 If `git push` fails (auth, conflicts, or branch protection), explain the error in plain language and the minimal next step—do not force-push to `main` unless Ines explicitly asks.
 
