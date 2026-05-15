@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Mail, ArrowRight, Menu, X, Heart } from 'lucide-react';
 
+/** Vite base path — `'/'` in dev, `'/pines-makes-website/'` in production Pages build */
+const STATIC_BASE = import.meta.env.BASE_URL;
+
 /** Wavy section transition (1960s organic flow) */
 function WaveDivider({ className, flip }: { className?: string; flip?: boolean }) {
   return (
@@ -50,38 +53,42 @@ function CloudPuff({ className, wobble = '' }: { className?: string; wobble?: ''
   );
 }
 
-/** Looping marquee row used as the hero centerpiece */
-function HeroMarqueeRow({
-  text,
-  textClassName,
-  duration,
-  reverse = false,
-  flowerColors,
-}: {
-  text: string;
-  textClassName: string;
-  duration: number;
-  reverse?: boolean;
-  flowerColors?: { petal: string; petalAlt: string; center: string };
-}) {
-  const repeats = Array.from({ length: 8 });
+/** Static hero logotype — bubble style (see docs/font-2.png) */
+const HERO_LOGO_LETTER_COLORS = [
+  'text-tuft-orange',
+  'text-tuft-lime',
+  'text-tuft-yellow',
+  'text-tuft-orange',
+  'text-tuft-yellow',
+  'text-tuft-orange',
+  'text-tuft-yellow',
+  'text-tuft-yellow',
+  'text-tuft-yellow',
+  'text-tuft-orange',
+] as const;
+
+function HeroBubbleTitle() {
+  const title = 'PINES MAKES';
+  let letterIndex = 0;
+
   return (
-    <motion.div
-      animate={{ x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] }}
-      transition={{ duration, repeat: Infinity, ease: 'linear' }}
-      className="flex w-max shrink-0 items-center gap-10 whitespace-nowrap md:gap-16"
-      aria-hidden
+    <h1
+      className="hero-bubble-title px-2 text-center text-6xl uppercase tracking-[-0.06em] sm:text-7xl md:text-8xl lg:text-9xl xl:text-[9.5rem]"
+      style={{ wordSpacing: '-0.12em' }}
     >
-      {[...repeats, ...repeats].map((_, i) => (
-        <React.Fragment key={i}>
-          <span className={textClassName}>{text}</span>
-          <FlowerDecal
-            className="shrink-0 h-10 w-10 md:h-16 md:w-16"
-            colors={flowerColors}
-          />
-        </React.Fragment>
-      ))}
-    </motion.div>
+      {title.split('').map((ch, i) => {
+        if (ch === ' ') {
+          return <span key={i} className="inline-block w-[0.22em] md:w-[0.3em]" aria-hidden />;
+        }
+        const colorClass = HERO_LOGO_LETTER_COLORS[letterIndex] ?? 'text-tuft-orange';
+        letterIndex += 1;
+        return (
+          <span key={i} className={`hero-bubble-letter ${colorClass}`}>
+            {ch}
+          </span>
+        );
+      })}
+    </h1>
   );
 }
 
@@ -125,37 +132,39 @@ function FlowerDecal({
 const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const navLinkClass =
+    'font-nav text-xs font-normal uppercase tracking-[0.22em] text-stone-900 transition-colors hover:text-tuft-orange md:text-[13px]';
+
+  const primaryBtnClass =
+    'font-nav cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-orange px-5 py-2.5 text-xs font-normal uppercase tracking-[0.2em] text-white shadow-[3px_3px_0_0_#0f0f0f] transition-[transform,box-shadow,background-color] hover:bg-tuft-magenta hover:shadow-[2px_2px_0_0_#0f0f0f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none md:px-6 md:text-[13px]';
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 pt-4">
-      <div className="max-w-7xl mx-auto flex h-[4.5rem] items-center justify-between rounded-[1.75rem] border-2 border-tuft-orange/40 bg-tuft-yellow/90 px-6 shadow-[0_12px_40px_-12px_rgb(60_40_50_0.18),0_4px_20px_-8px_rgb(60_40_50_0.10)] backdrop-blur-md md:px-8">
-        <a href="#" className="font-sans text-sm font-semibold tracking-wide text-stone-900 transition-colors hover:text-tuft-teal">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 font-nav">
+      <div className="max-w-7xl mx-auto flex h-14 items-center justify-between rounded-sm border-2 border-stone-900 bg-white px-4 nav-brutal-shadow md:h-[3.75rem] md:px-6">
+        <a href="#" className={navLinkClass}>
           Home
         </a>
 
-        <div className="hidden items-center gap-10 font-sans text-sm font-semibold tracking-wide md:flex">
-          <a href="#" className="text-stone-900 transition-colors hover:text-tuft-teal">
-            GALLERY
+        <div className="hidden items-center gap-8 md:flex md:gap-10">
+          <a href="#" className={navLinkClass}>
+            Gallery
           </a>
-          <a href="#" className="text-stone-900 transition-colors hover:text-tuft-teal">
-            PROCESS
+          <a href="#" className={navLinkClass}>
+            Process
           </a>
-          <button
-            type="button"
-            onClick={onContactClick}
-            className="blob-inflate cursor-pointer rounded-full border-2 border-tuft-orange/60 bg-tuft-orange px-7 py-2.5 font-sans font-bold text-white shadow-[0_6px_20px_-4px_rgb(255_122_26_0.5)] transition-all hover:bg-tuft-magenta hover:border-tuft-magenta active:scale-[0.98]"
-          >
-            ORDER CUSTOM
+          <button type="button" onClick={onContactClick} className={primaryBtnClass}>
+            Order Custom
           </button>
         </div>
 
         <button
           type="button"
-          className="rounded-full p-2 md:hidden"
+          className="rounded-sm border-2 border-stone-900 bg-white p-2 text-stone-900 shadow-[2px_2px_0_0_#0f0f0f] transition-[transform,box-shadow] hover:bg-soft-bg md:hidden"
           aria-label="Menu"
           aria-expanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
         >
-          {isOpen ? <X size={26} /> : <Menu size={26} />}
+          {isOpen ? <X size={22} strokeWidth={2.25} /> : <Menu size={22} strokeWidth={2.25} />}
         </button>
       </div>
 
@@ -166,17 +175,17 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute top-[calc(100%+0.5rem)] right-4 left-4 mx-auto max-w-7xl rounded-[1.75rem] border-2 border-tuft-orange/30 bg-tuft-yellow/95 p-8 shadow-[0_24px_50px_-20px_rgb(45_30_40_0.22)] md:hidden"
+            className="absolute top-[calc(100%+0.5rem)] right-4 left-4 mx-auto max-w-7xl rounded-sm border-2 border-stone-900 bg-white p-6 nav-brutal-shadow md:hidden"
           >
-            <div className="flex flex-col gap-6">
-              <a href="#" onClick={() => setIsOpen(false)} className="font-retro text-2xl text-tuft-teal">
+            <div className="flex flex-col gap-5">
+              <a href="#" onClick={() => setIsOpen(false)} className={`${navLinkClass} text-base`}>
                 Home
               </a>
-              <a href="#" onClick={() => setIsOpen(false)} className="font-retro text-2xl text-tuft-teal">
-                GALLERY
+              <a href="#" onClick={() => setIsOpen(false)} className={`${navLinkClass} text-base`}>
+                Gallery
               </a>
-              <a href="#" onClick={() => setIsOpen(false)} className="font-retro text-2xl text-tuft-teal">
-                PROCESS
+              <a href="#" onClick={() => setIsOpen(false)} className={`${navLinkClass} text-base`}>
+                Process
               </a>
               <button
                 type="button"
@@ -184,9 +193,9 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
                   onContactClick();
                   setIsOpen(false);
                 }}
-                className="blob-inflate w-full cursor-pointer rounded-[1.25rem] bg-tuft-orange py-4 font-retro text-lg text-white shadow-[0_10px_30px_-8px_rgb(255_122_26_0.5)] transition-all hover:bg-tuft-magenta"
+                className={`${primaryBtnClass} w-full py-3.5`}
               >
-                CONTACT ME
+                Contact Me
               </button>
             </div>
           </motion.div>
@@ -207,47 +216,13 @@ const Hero = () => {
       <FlowerDecal className="pointer-events-none absolute right-[8%] top-20 w-28 opacity-70 md:w-36" />
       <FlowerDecal className="pointer-events-none absolute left-[12%] bottom-12 w-20 opacity-50 rotate-12 md:w-28" />
 
-      {/* DRAMATIC HERO MARQUEE STACK */}
       <motion.div
-        initial={{ opacity: 0, y: -24 }}
+        initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-[1] mb-10 flex flex-col gap-1 md:mb-16 md:gap-3"
+        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-[1] -rotate-1 mb-10 md:mb-16"
       >
-        <div className="-rotate-1">
-          <HeroMarqueeRow
-            text="PINES MAKES"
-            textClassName="hero-headline font-retro uppercase text-tuft-magenta text-6xl md:text-8xl lg:text-[10rem] leading-[0.95]"
-            duration={190}
-            flowerColors={{ petal: '#ff7a1a', petalAlt: '#ffdd2e', center: '#e11d74' }}
-          />
-        </div>
-        <div className="rotate-[1.2deg]">
-          <HeroMarqueeRow
-            text="PINES MAKES"
-            textClassName="hero-headline font-retro uppercase text-tuft-orange text-5xl md:text-7xl lg:text-[8.5rem] leading-[0.95]"
-            duration={130}
-            reverse
-            flowerColors={{ petal: '#0d9e90', petalAlt: '#c4f000', center: '#ff7a1a' }}
-          />
-        </div>
-        <div className="-rotate-[0.5deg]">
-          <HeroMarqueeRow
-            text="PINES MAKES"
-            textClassName="hero-headline font-retro uppercase text-tuft-teal text-5xl md:text-7xl lg:text-[9rem] leading-[0.95]"
-            duration={160}
-            flowerColors={{ petal: '#e11d74', petalAlt: '#ffdd2e', center: '#0d9e90' }}
-          />
-        </div>
-        <div className="rotate-[0.8deg]">
-          <HeroMarqueeRow
-            text="PINES MAKES"
-            textClassName="hero-headline font-retro uppercase text-tuft-lilac text-4xl md:text-6xl lg:text-[7.5rem] leading-[0.95]"
-            duration={110}
-            reverse
-            flowerColors={{ petal: '#ffdd2e', petalAlt: '#ff7a1a', center: '#9d6bff' }}
-          />
-        </div>
+        <HeroBubbleTitle />
       </motion.div>
 
       <div className="relative z-[1] mx-auto max-w-7xl px-6">
@@ -257,13 +232,13 @@ const Hero = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="blob-inflate mb-6 inline-block rounded-full bg-tuft-orange px-5 py-2 font-sans text-xs font-bold tracking-widest text-white">
-              HANDMADE WITH LOVE
+            <div className="mb-6 inline-block rounded-sm border-2 border-stone-900 bg-tuft-yellow px-4 py-1.5 font-nav text-[10px] font-normal uppercase tracking-[0.28em] text-stone-900 shadow-[3px_3px_0_0_#0f0f0f] md:px-5 md:text-xs">
+              Handmade with love
             </div>
-            <h1 className="hero-headline mb-8 font-retro text-5xl leading-[0.95] text-stone-900 md:text-7xl lg:text-8xl">
+            <h2 className="hero-headline mb-8 font-retro text-5xl leading-[0.95] text-stone-900 md:text-7xl lg:text-8xl">
               Soft textures for{' '}
               <span className="text-tuft-magenta">happy</span> walls.
-            </h1>
+            </h2>
             <p className="mb-10 max-w-md font-sans text-lg leading-relaxed text-stone-600">
               Unique tufted wall hangings designed to bring warmth, color, and a touch of groovy retro
               whimsy to your space.
@@ -271,10 +246,10 @@ const Hero = () => {
             <div className="flex flex-wrap gap-4">
               <button
                 type="button"
-                className="blob-inflate group flex cursor-pointer items-center gap-2 rounded-full bg-tuft-teal px-9 py-4 font-sans text-base font-bold text-white transition-all hover:brightness-110 active:scale-[0.98]"
+                className="group flex cursor-pointer items-center gap-2 rounded-sm border-2 border-stone-900 bg-tuft-teal px-7 py-3 font-nav text-sm font-normal uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-110 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none md:px-8 md:text-[15px]"
               >
                 View Collection
-                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                <ArrowRight size={18} strokeWidth={2.5} className="transition-transform group-hover:translate-x-1" />
               </button>
             </div>
           </motion.div>
@@ -298,7 +273,7 @@ const Hero = () => {
               style={{ borderRadius: '46% 54% 52% 48% / 44% 48% 52% 56%' }}
             >
               <img
-                src="/cheece-rug-1.jpg"
+                src={`${STATIC_BASE}cheece-rug-1.jpg`}
                 alt="Tufted wall art"
                 className="h-full w-full object-cover"
                 id="hero-image"
@@ -321,11 +296,11 @@ function HeroToGalleryWave() {
 }
 
 const galleryItems = [
-  { id: 1, title: 'Pastel Dream', accent: 'ring-tuft-yellow/60', blob: 'blob-squish-1', img: '/rug-1.jpg' },
-  { id: 2, title: 'Soft Waves', accent: 'ring-tuft-magenta/50', blob: 'blob-squish-2', img: '/rug-2.jpg' },
-  { id: 3, title: 'Retro Bloom', accent: 'ring-tuft-orange/50', blob: 'blob-squish-3', img: '/rug-3.jpg' },
-  { id: 4, title: 'Sunset Tuft', accent: 'ring-tuft-teal/50', blob: 'blob-squish-4', img: '/rug-4.jpg' },
-  { id: 5, title: 'Azure Flow', accent: 'ring-tuft-lime/50', blob: 'blob-squish-1', img: '/rug-5.jpg' },
+  { id: 1, title: 'Pastel Dream', accent: 'ring-tuft-yellow/60', blob: 'blob-squish-1', img: `${STATIC_BASE}rug-1.jpg` },
+  { id: 2, title: 'Soft Waves', accent: 'ring-tuft-magenta/50', blob: 'blob-squish-2', img: `${STATIC_BASE}rug-2.jpg` },
+  { id: 3, title: 'Retro Bloom', accent: 'ring-tuft-orange/50', blob: 'blob-squish-3', img: `${STATIC_BASE}rug-3.jpg` },
+  { id: 4, title: 'Sunset Tuft', accent: 'ring-tuft-teal/50', blob: 'blob-squish-4', img: `${STATIC_BASE}rug-4.jpg` },
+  { id: 5, title: 'Azure Flow', accent: 'ring-tuft-lime/50', blob: 'blob-squish-1', img: `${STATIC_BASE}rug-5.jpg` },
 ];
 
 const Gallery = () => {
@@ -343,8 +318,8 @@ const Gallery = () => {
                 Every piece is slow-made, ensuring the highest quality texture and detail.
               </p>
             </div>
-            <div className="blob-inflate inline-flex items-center rounded-full bg-tuft-orange px-6 py-3 font-sans text-xs font-bold tracking-widest text-white">
-              EST. 2024
+            <div className="inline-flex items-center rounded-sm border-2 border-stone-900 bg-white px-5 py-2.5 font-nav text-[10px] font-normal uppercase tracking-[0.28em] text-stone-900 shadow-[3px_3px_0_0_#0f0f0f] md:text-xs">
+              Est. 2024
             </div>
           </div>
 
@@ -473,7 +448,7 @@ const Contact = ({ id }: { id: string }) => {
             </div>
             <button
               type="submit"
-              className="blob-inflate w-full cursor-pointer rounded-[1.75rem] bg-tuft-magenta py-5 font-retro text-xl text-white transition-all hover:brightness-105 active:scale-[0.98]"
+              className="w-full cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-magenta py-4 font-nav text-base font-normal uppercase tracking-[0.16em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-105 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none md:py-5 md:text-lg"
             >
               Send Message
             </button>
@@ -524,7 +499,7 @@ export default function App() {
             <button
               type="button"
               onClick={scrollToContact}
-              className="blob-inflate cursor-pointer rounded-full bg-tuft-orange px-10 py-5 font-retro text-xl text-white shadow-[0_16px_40px_-12px_rgb(255_122_26_0.55)] transition-all hover:bg-tuft-yellow hover:text-stone-900 active:scale-[0.98]"
+              className="cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-orange px-8 py-4 font-nav text-base font-normal uppercase tracking-[0.18em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,background-color,color] hover:bg-tuft-yellow hover:text-stone-900 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none md:px-10 md:text-lg"
             >
               Start a Commission
             </button>
@@ -538,7 +513,7 @@ export default function App() {
 
       <footer className="relative z-[1] mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border-t border-tuft-magenta/10 px-6 py-12 text-sm text-stone-500 font-sans md:flex-row">
         <img
-          src="/font-2.png"
+          src={`${STATIC_BASE}font-2.png`}
           alt="Pines Makes"
           className="h-10 w-auto object-contain md:h-11"
           width={1024}

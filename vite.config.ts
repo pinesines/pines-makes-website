@@ -8,12 +8,8 @@ import type {Plugin} from 'vite';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/**
- * Pages URL base: `'/'` for org/user site at https://pines-makes-website.github.io/
- * (repo named `pines-makes-website.github.io`, source `/docs`).
- * Use `'/repo-name/'` only for project pages at https://<user>.github.io/<repo-name>/.
- */
-const GITHUB_PAGES_BASE = '/';
+/** Project Pages URL — must match repo name slug: https://<user>.github.io/pines-makes-website/ */
+const GITHUB_PAGES_PROJECT_BASE = '/pines-makes-website/';
 
 /** GitHub Pages serves 404.html for unknown paths, so SPA deep links load the app. */
 function githubPagesSpaFallback(outDir: string): Plugin {
@@ -29,8 +25,10 @@ function githubPagesSpaFallback(outDir: string): Plugin {
 
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
+  const base = mode === 'production' ? GITHUB_PAGES_PROJECT_BASE : '/';
+
   return {
-    base: GITHUB_PAGES_BASE,
+    base,
     plugins: [react(), tailwindcss(), githubPagesSpaFallback('docs')],
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
