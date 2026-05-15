@@ -1,4 +1,4 @@
-.PHONY: help install dev build preview serve-docs
+.PHONY: help install dev build preview serve-docs deploy
 
 help: ## Show targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -22,3 +22,8 @@ serve-docs: ## python http.server with /pines-makes-website/ → docs/ (same bas
 	  ln -sf "$(CURDIR)/docs" "$$tmpdir/pines-makes-website"; \
 	  printf 'Open: http://127.0.0.1:8888/pines-makes-website/\n'; \
 	  cd "$$tmpdir" && python3 -m http.server 8888 --bind 127.0.0.1
+
+deploy: ## git add ., commit with UTC ISO timestamp message, push origin main (GitHub Pages)
+	git add .
+	git commit -m "$$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+	git push origin main
