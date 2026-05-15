@@ -6,7 +6,7 @@ alwaysApply: true
 
 **Pines Makes** is the marketing site for Pines Ines’s handmade tufted wall hangings and custom rugs. The stack is **Vite + React + TypeScript**, **Tailwind CSS**, and assets under `public/`. Source lives in `src/` (main UI in `src/App.tsx`).
 
-**Production hosting:** GitHub Pages as a **project site**. The Vite `base` path is `/pines-makes-website/`, and **`make build` writes the static site into `docs/`** (including copying `index.html` to `docs/404.html` so client-side routes work on GitHub Pages). The live URL matches: `https://<owner>.github.io/pines-makes-website/`.
+**Production hosting:** GitHub Pages as a **project site**. The Vite `base` path is `/pines-makes-website/`, and **`make build` writes the static site into `docs/`** (including copying `index.html` to `docs/404.html` so client-side routes work on GitHub Pages). The public site is **[https://pinesines.github.io/pines-makes-website](https://pinesines.github.io/pines-makes-website)**.
 
 **Useful Makefile targets:** `make install` (dependencies), `make dev` (local dev server), `make build` (production output to `docs/`), `make preview` (preview with the same base path as Pages), `make serve-docs` (optional local test of the `docs/` folder behind `/pines-makes-website/`).
 
@@ -28,13 +28,13 @@ Ines is the founder and creator of Pines Ines. She is an artist with limited cod
 
 ## Deploy: how agents must assist Ines
 
-When Ines wants changes **live on GitHub Pages**, follow this sequence from the repo root (and **push to `main`**, which should drive Pages if the repo is configured that way):
+When Ines wants changes **live on GitHub Pages**, follow this sequence from the repo root. **Pushing to `main` triggers the repo’s GitHub Actions workflow for Pages**, which publishes the updated site to **[https://pinesines.github.io/pines-makes-website](https://pinesines.github.io/pines-makes-website)** (after the workflow finishes—usually within a minute or two).
 
 1. **Build:** `make build` — refreshes `docs/` and bundled assets.
 2. **Stage:** `git add .`
 3. **Commit with a timestamp message** (UTC is fine and sortable), for example:
    - `git commit -m "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"`
-4. **Push to main:** `git push origin main`
+4. **Push to `main`:** `git push origin main` — this is the step that kicks off GitHub Pages deployment via Actions.
 
 If `git push` fails (auth, conflicts, or branch protection), explain the error in plain language and the minimal next step—do not force-push to `main` unless Ines explicitly asks.
 
