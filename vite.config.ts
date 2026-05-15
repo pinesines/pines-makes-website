@@ -8,8 +8,12 @@ import type {Plugin} from 'vite';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/** GitHub project page URL path. Use `'/'` for a user/org root site or custom domain at `/`. */
-const GITHUB_PAGES_BASE = '/pines-makes-website/';
+/**
+ * Pages URL base: `'/'` for org/user site at https://pines-makes-website.github.io/
+ * (repo named `pines-makes-website.github.io`, source `/docs`).
+ * Use `'/repo-name/'` only for project pages at https://<user>.github.io/<repo-name>/.
+ */
+const GITHUB_PAGES_BASE = '/';
 
 /** GitHub Pages serves 404.html for unknown paths, so SPA deep links load the app. */
 function githubPagesSpaFallback(outDir: string): Plugin {

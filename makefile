@@ -15,5 +15,6 @@ build: ## Production build → docs/ (for GitHub Pages /docs)
 preview: ## Preview production build (output is docs/)
 	npm run preview
 
-serve-docs: ## Preview ./docs with correct Pages base (same as preview; prefer over raw http.server)
-	npm run preview
+serve-docs: ## Python http.server: same as *.github.io root — run `make build` first; open http://127.0.0.1:8888/
+	@test -f docs/index.html || (echo "No docs/ build found. Run: make build" && exit 1)
+	cd docs && python3 -m http.server 8888 --bind 127.0.0.1
