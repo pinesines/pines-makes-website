@@ -68,18 +68,7 @@ function CloudPuff({
 }
 
 /** Static hero logotype — bubble style (see docs/font-2.png) */
-const HERO_LOGO_LETTER_COLORS = [
-  'text-tuft-orange',
-  'text-tuft-lime',
-  'text-tuft-yellow',
-  'text-tuft-orange',
-  'text-tuft-yellow',
-  'text-tuft-orange',
-  'text-tuft-yellow',
-  'text-tuft-yellow',
-  'text-tuft-yellow',
-  'text-tuft-orange',
-] as const;
+const HERO_LOGO_LETTER_COLOR = 'text-tuft-peachy';
 
 function BubbleDisplayTitle({
   text,
@@ -91,7 +80,6 @@ function BubbleDisplayTitle({
   className?: string;
 }) {
   const upper = text.toUpperCase();
-  let letterIndex = 0;
   const Comp = as;
 
   return (
@@ -103,11 +91,8 @@ function BubbleDisplayTitle({
         if (ch === ' ') {
           return <span key={i} className="inline-block w-[0.22em] md:w-[0.3em]" aria-hidden />;
         }
-        const colorClass =
-          HERO_LOGO_LETTER_COLORS[letterIndex % HERO_LOGO_LETTER_COLORS.length] ?? 'text-tuft-orange';
-        letterIndex += 1;
         return (
-          <span key={i} className={`hero-bubble-letter ${colorClass}`}>
+          <span key={i} className={`hero-bubble-letter ${HERO_LOGO_LETTER_COLOR}`}>
             {ch}
           </span>
         );
@@ -270,11 +255,10 @@ const Hero = () => {
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="mb-6 inline-block rounded-sm border-2 border-stone-900 bg-tuft-yellow px-4 py-1.5 font-sans text-[10px] font-normal uppercase tracking-[0.28em] text-stone-900 shadow-[3px_3px_0_0_#0f0f0f] md:px-5 md:text-xs">
-              Handmade with love
+              Handcrafted Tufted Art
             </div>
             <h2 className="mb-8 font-sans text-5xl leading-[0.95] text-stone-900 md:text-7xl lg:text-8xl">
-              Soft textures for{' '}
-              <span className="text-tuft-magenta">happy</span> walls.
+              No Two Rugs Alike
             </h2>
             <p className="mb-10 max-w-md font-sans text-lg leading-relaxed text-stone-600">
               Unique tufted wall hangings designed to bring warmth, color, and a touch of groovy retro
