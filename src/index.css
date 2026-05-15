@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Modak&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Modak&family=Share+Tech+Mono&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
-  --font-retro: "Lilita One", ui-rounded, system-ui, sans-serif;
-  --font-bubble: "Modak", "Lilita One", ui-rounded, system-ui, sans-serif;
-  --font-nav: "Share Tech Mono", ui-monospace, monospace;
+  --font-sans: "Share Tech Mono", ui-monospace, monospace;
+  --font-bubble: "Modak", ui-rounded, system-ui, sans-serif;
 
   /* Rug + Mystery Machine palette */
   --color-tuft-magenta: #e11d74;
@@ -32,20 +30,6 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
 }
 
-.logo-decal {
-  text-shadow:
-    2px 2px 0 var(--color-tuft-teal),
-    -2px -2px 0 var(--color-tuft-orange),
-    0 6px 18px rgb(40 25 30 / 0.18);
-}
-
-.hero-headline {
-  text-shadow:
-    3px 3px 0 rgb(13 158 144 / 0.35),
-    -2px -2px 0 rgb(255 122 26 / 0.25),
-    0 10px 28px rgb(60 40 45 / 0.12);
-}
-
 /** Reference: docs/font-2.png — chunky bubble letters + black outline */
 .hero-bubble-title {
   font-family: var(--font-bubble);
@@ -65,12 +49,15 @@
   }
 }
 
-/** Logo-adjacent: soft inflated / sticker-like type */
-.blob-type {
-  text-shadow:
-    2px 2px 0 rgb(255 255 255 / 0.55),
-    3px 7px 0 rgb(55 40 48 / 0.08),
-    -1px -1px 0 rgb(255 255 255 / 0.4);
+/** Slightly lighter outline for mid-size bubble headings (e.g. “Work with me”) */
+.hero-bubble-section-title .hero-bubble-letter {
+  -webkit-text-stroke: min(0.065em, 2.5px) #0f0f0f;
+}
+
+@media (min-width: 768px) {
+  .hero-bubble-section-title .hero-bubble-letter {
+    -webkit-text-stroke: min(0.05em, 3px) #0f0f0f;
+  }
 }
 
 /** Irregular chunky radii — pair with rotate-* for variety */
@@ -111,34 +98,6 @@
     inset 0 2px 10px rgb(255 255 255 / 0.45),
     inset 0 -8px 18px rgb(55 40 48 / 0.05),
     0 12px 32px -14px rgb(55 40 50 / 0.18);
-}
-
-/** Bouncy paint-splat wobble — gentle perpetual squish */
-@keyframes splat-wobble-kf {
-  0%, 100% { transform: scale(1, 1) rotate(0deg); }
-  25%      { transform: scale(1.05, 0.94) rotate(-1.2deg); }
-  50%      { transform: scale(0.96, 1.06) rotate(0.8deg); }
-  75%      { transform: scale(1.03, 0.98) rotate(1.4deg); }
-}
-
-.splat-wobble {
-  transform-origin: 50% 50%;
-  transform-box: fill-box;
-  animation: splat-wobble-kf 9s ease-in-out infinite;
-  will-change: transform;
-}
-
-/** Stagger variants so simultaneous splats don't pulse in sync */
-.splat-wobble-fast {
-  animation-duration: 6.5s;
-  animation-delay: -2s;
-}
-.splat-wobble-slow {
-  animation-duration: 12s;
-  animation-delay: -4s;
-}
-.splat-wobble-offset {
-  animation-delay: -3.5s;
 }
 
 /** Crisp UI chrome — hard border + offset shadow, pairs with hero bubble type */
