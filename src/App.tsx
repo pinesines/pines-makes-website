@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Mail, ArrowRight, Menu, X } from 'lucide-react';
+import { GroovyWaveBackground } from './GroovyWaveBackground';
 
 /** Vite base path — `'/'` in dev, `'/pines-makes-website/'` in production Pages build */
 const STATIC_BASE = import.meta.env.BASE_URL;
@@ -23,47 +24,6 @@ function WaveDivider({ className, flip }: { className?: string; flip?: boolean }
         />
       </svg>
     </div>
-  );
-}
-
-/** Paint-splat blob — static shape; wrapper moves on scroll for parallax */
-function CloudPuff({
-  className,
-  parallax = 0.14,
-  center = false,
-}: {
-  className?: string;
-  /** Multiplier on `scrollY` for vertical drift (lower = subtler). */
-  parallax?: number;
-  /** Set when using `left-1/2` so horizontal centering isn’t lost to transform. */
-  center?: boolean;
-}) {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, (latest) => latest * parallax);
-
-  return (
-    <motion.div className={className} style={center ? { x: '-50%', y } : { y }} aria-hidden>
-      <svg
-        className="block h-auto w-full max-w-none"
-        viewBox="0 0 640 320"
-        fill="currentColor"
-        aria-hidden
-      >
-        <g>
-          {/* Main splat body with spiky drips */}
-          <path d="M 90 175 C 35 165 -5 110 30 70 C 60 35 130 55 130 25 C 155 -5 205 -10 220 30 C 240 -5 290 0 290 30 C 320 40 330 -5 380 15 C 410 -15 445 0 445 30 C 470 40 510 -5 540 40 C 590 50 605 95 575 110 C 620 125 640 165 595 195 C 645 215 605 250 575 250 C 555 285 505 260 480 285 C 505 325 435 320 420 285 C 400 300 375 270 360 290 C 340 325 305 310 285 280 C 265 295 240 315 215 280 C 195 315 160 295 145 275 C 115 290 85 300 60 270 C 35 295 -5 270 30 225 C -5 215 -15 175 25 165 C 40 155 75 170 90 175 Z" />
-          {/* Satellite paint droplets */}
-          <ellipse cx="30" cy="270" rx="14" ry="10" />
-          <circle cx="12" cy="295" r="6" />
-          <ellipse cx="605" cy="105" rx="11" ry="8" />
-          <circle cx="630" cy="82" r="5" />
-          <ellipse cx="455" cy="305" rx="9" ry="5" />
-          <circle cx="320" cy="312" r="8" />
-          <circle cx="180" cy="315" r="6" />
-          <circle cx="595" cy="285" r="7" />
-        </g>
-      </svg>
-    </motion.div>
   );
 }
 
@@ -101,42 +61,148 @@ function BubbleDisplayTitle({
   );
 }
 
-/** Single organic petal (curved teardrop), tip toward -Y; rotates around 100,100 */
-const FLOWER_PETAL_D =
-  'M 100 12 C 138 22 142 62 128 86 C 118 102 106 112 100 116 C 94 112 82 102 72 86 C 58 62 62 22 100 12 Z';
+/** One rounded petal, tip toward top (−Y); rotates around 100,100 (5-fold symmetry) */
+const FLOWER_PETAL_5_D =
+  'M 100 34 C 118 44 126 72 116 90 C 110 96 104 99 100 100 C 96 99 90 96 84 90 C 74 72 82 44 100 34 Z';
 
-/** Mystery Machine-style daisy flower decal */
+/** Simple paired leaves below the bloom */
+const FLOWER_LEAF_LEFT_D =
+  'M 100 101 C 88 104 74 118 72 136 C 69 152 79 160 88 150 C 94 140 98 118 100 106 Z';
+const FLOWER_LEAF_RIGHT_D =
+  'M 100 101 C 112 104 126 118 128 136 C 131 152 121 160 112 150 C 106 140 102 118 100 106 Z';
+
+const PETAL_ROTATIONS_5 = [0, 72, 144, 216, 288];
+
+/** Small five-petal flower with leaves (scattered accents) */
 function FlowerDecal({
   className,
   colors,
 }: {
   className?: string;
-  colors?: { petal: string; petalAlt: string; center: string };
+  colors?: { petal: string; center: string; leaf?: string; leafAlt?: string };
 }) {
   const petal = colors?.petal ?? '#ff7a1a';
-  const petalAlt = colors?.petalAlt ?? '#ffdd2e';
   const center = colors?.center ?? '#ff7a1a';
+  const leaf = colors?.leaf ?? '#0d9e90';
+  const leafAlt = colors?.leafAlt ?? '#067a6f';
 
   return (
     <svg className={className} viewBox="0 0 200 200" aria-hidden>
-      <motion.g
-        animate={{ rotate: 360 }}
-        transition={{ duration: 200, repeat: Infinity, ease: 'linear' }}
-        style={{ transformOrigin: '100px 100px' }}
-      >
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
-          <path
-            key={deg}
-            d={FLOWER_PETAL_D}
-            fill={i % 2 === 0 ? petal : petalAlt}
-            transform={`rotate(${deg} 100 100)`}
-          />
+      <g style={{ transformOrigin: '100px 100px' }}>
+        <path d={FLOWER_LEAF_LEFT_D} fill={leaf} />
+        <path d={FLOWER_LEAF_RIGHT_D} fill={leafAlt} />
+        {PETAL_ROTATIONS_5.map((deg) => (
+          <path key={deg} d={FLOWER_PETAL_5_D} fill={petal} transform={`rotate(${deg} 100 100)`} />
         ))}
-        <circle cx="100" cy="100" r="24" fill={center} />
-      </motion.g>
+        <circle cx="100" cy="100" r="18" fill={center} />
+      </g>
     </svg>
   );
 }
+
+type FlowerSpot = {
+  className: string;
+  colors?: { petal: string; center: string; leaf?: string; leafAlt?: string };
+};
+
+function ScatteredLittleFlowers({ spots }: { spots: FlowerSpot[] }) {
+  return (
+    <>
+      {spots.map((spot, i) => (
+        <FlowerDecal key={i} colors={spot.colors} className={`pointer-events-none absolute ${spot.className}`} />
+      ))}
+    </>
+  );
+}
+
+/** Scattered accent flowers — rotate pink / yellow / lilac / mint / blue */
+const FLOWER_ACCENTS = {
+  pink: {
+    petal: '#fb9ec4',
+    center: '#e11d74',
+    leaf: '#14896d',
+    leafAlt: '#0d6b52',
+  },
+  yellow: {
+    petal: '#ffdd2e',
+    center: '#f97316',
+    leaf: '#1d9a72',
+    leafAlt: '#157a59',
+  },
+  lilac: {
+    petal: '#9d6bff',
+    center: '#7c3aed',
+    leaf: '#189873',
+    leafAlt: '#127a5b',
+  },
+  mint: {
+    petal: '#5eead4',
+    center: '#0d9488',
+    leaf: '#047857',
+    leafAlt: '#065f46',
+  },
+  blue: {
+    petal: '#7dd3fc',
+    center: '#2563eb',
+    leaf: '#14b8a6',
+    leafAlt: '#0d9488',
+  },
+} as const satisfies Record<string, NonNullable<FlowerSpot['colors']>>;
+
+const FLOWER_ON_TEAL = {
+  pink: { ...FLOWER_ACCENTS.pink, leaf: '#043d38', leafAlt: '#022925' },
+  yellow: { ...FLOWER_ACCENTS.yellow, leaf: '#043d38', leafAlt: '#022925' },
+  lilac: { ...FLOWER_ACCENTS.lilac, leaf: '#043d38', leafAlt: '#022925' },
+  mint: { ...FLOWER_ACCENTS.mint, leaf: '#043d38', leafAlt: '#022925' },
+  blue: { ...FLOWER_ACCENTS.blue, leaf: '#043d38', leafAlt: '#022925' },
+} as const;
+
+const heroLittleFlowers: FlowerSpot[] = [
+  { className: 'left-[5%] top-[8%] w-12 opacity-45 -rotate-[18deg]', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[14%] top-[22%] w-14 opacity-35 rotate-6', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[7%] top-[12%] w-14 opacity-40 rotate-12', colors: FLOWER_ACCENTS.lilac },
+  { className: 'right-[18%] top-[28%] w-12 opacity-30 -rotate-8', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[8%] top-[42%] w-12 opacity-35 rotate-[22deg]', colors: FLOWER_ACCENTS.blue },
+  { className: 'right-[6%] top-[48%] w-12 opacity-35 -rotate-6', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[3%] bottom-[28%] w-12 opacity-40 -rotate-12', colors: FLOWER_ACCENTS.yellow },
+  { className: 'left-[20%] bottom-[18%] w-14 opacity-30 rotate-9', colors: FLOWER_ACCENTS.lilac },
+  { className: 'right-[4%] bottom-[22%] w-11 opacity-45 rotate-[14deg]', colors: FLOWER_ACCENTS.mint },
+  { className: 'right-[16%] bottom-[10%] w-14 opacity-35 -rotate-[10deg]', colors: FLOWER_ACCENTS.blue },
+  { className: 'left-[42%] top-[6%] w-10 opacity-25 -rotate-45 hidden sm:block', colors: FLOWER_ACCENTS.pink },
+  { className: 'right-[40%] bottom-[14%] w-10 opacity-25 rotate-12 hidden sm:block', colors: FLOWER_ACCENTS.yellow },
+];
+
+const galleryLittleFlowers: FlowerSpot[] = [
+  { className: 'left-[4%] top-[6%] w-12 opacity-35 -rotate-12', colors: FLOWER_ACCENTS.lilac },
+  { className: 'left-[12%] top-[32%] w-11 opacity-30 rotate-9 hidden lg:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'right-[8%] top-[14%] w-12 opacity-35 rotate-6', colors: FLOWER_ACCENTS.blue },
+  { className: 'right-[3%] top-[48%] w-11 opacity-25 -rotate-[16deg]', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[6%] bottom-[20%] w-12 opacity-30 rotate-12', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[14%] bottom-[8%] w-14 opacity-35 -rotate-6', colors: FLOWER_ACCENTS.lilac },
+  { className: 'left-[35%] top-[18%] w-10 opacity-20 rotate-45 hidden md:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'right-[38%] bottom-[24%] w-10 opacity-22 -rotate-12 hidden md:block', colors: FLOWER_ACCENTS.blue },
+];
+
+const contactLittleFlowers: FlowerSpot[] = [
+  { className: 'left-[4%] top-[10%] w-12 opacity-40 -rotate-10', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[16%] top-[22%] w-14 opacity-35 rotate-8', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[6%] top-[14%] w-12 opacity-35 rotate-12', colors: FLOWER_ACCENTS.lilac },
+  { className: 'right-[15%] top-[8%] w-11 opacity-30 -rotate-6', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[8%] bottom-[30%] w-12 opacity-35 rotate-[18deg]', colors: FLOWER_ACCENTS.blue },
+  { className: 'left-[22%] bottom-[12%] w-11 opacity-30 -rotate-12', colors: FLOWER_ACCENTS.pink },
+  { className: 'right-[5%] bottom-[18%] w-14 opacity-40 -rotate-9', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[20%] bottom-[8%] w-12 opacity-35 rotate-6', colors: FLOWER_ACCENTS.lilac },
+  { className: 'left-[45%] top-[6%] w-10 opacity-25 rotate-45 hidden sm:block', colors: FLOWER_ACCENTS.mint },
+];
+
+const tealBannerLittleFlowers: FlowerSpot[] = [
+  { className: 'left-[5%] top-[18%] w-12 opacity-45 -rotate-12', colors: FLOWER_ON_TEAL.pink },
+  { className: 'left-[14%] bottom-[22%] w-11 opacity-40 rotate-9', colors: FLOWER_ON_TEAL.yellow },
+  { className: 'right-[7%] top-[20%] w-12 opacity-45 rotate-6', colors: FLOWER_ON_TEAL.lilac },
+  { className: 'right-[18%] bottom-[26%] w-12 opacity-40 -rotate-[14deg]', colors: FLOWER_ON_TEAL.mint },
+  { className: 'left-[32%] top-[12%] w-10 opacity-35 rotate-45 hidden md:block', colors: FLOWER_ON_TEAL.blue },
+  { className: 'right-[35%] bottom-[14%] w-10 opacity-35 -rotate-6 hidden md:block', colors: FLOWER_ON_TEAL.pink },
+];
 
 const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -217,22 +283,7 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
 const Hero = () => {
   return (
     <section className="relative overflow-hidden pt-32 pb-12">
-      {/* Vivid van-body color panels */}
-      <CloudPuff
-        parallax={0.13}
-        className="pointer-events-none absolute -left-40 top-16 w-[480px] text-tuft-lime/40 md:w-[580px]"
-      />
-      <CloudPuff
-        parallax={-0.1}
-        className="pointer-events-none absolute -right-24 top-28 w-[420px] -scale-x-100 text-tuft-teal/35 md:w-[520px]"
-      />
-      <CloudPuff
-        parallax={0.17}
-        className="pointer-events-none absolute -right-16 bottom-8 w-[360px] rotate-12 text-tuft-yellow/50 md:w-[440px]"
-      />
-      {/* Flower decals */}
-      <FlowerDecal className="pointer-events-none absolute right-[8%] top-20 w-28 opacity-70 md:w-36" />
-      <FlowerDecal className="pointer-events-none absolute left-[12%] bottom-12 w-20 opacity-50 rotate-12 md:w-28" />
+      <ScatteredLittleFlowers spots={heroLittleFlowers} />
 
       <motion.div
         initial={{ opacity: 0, y: -16 }}
@@ -328,11 +379,7 @@ const Gallery = () => {
   return (
     <section className="shrink-0 bg-soft-bg">
       <div className="relative px-6 pb-24 pt-6">
-        <CloudPuff
-          parallax={0.11}
-          className="pointer-events-none absolute right-[5%] top-8 hidden w-[260px] text-tuft-teal/30 lg:block"
-        />
-        <FlowerDecal className="pointer-events-none absolute left-[3%] top-10 hidden w-24 opacity-60 lg:block" />
+        <ScatteredLittleFlowers spots={galleryLittleFlowers} />
 
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row md:items-end">
@@ -385,15 +432,7 @@ const Contact = ({ id }: { id: string }) => {
       id={id}
       className="relative overflow-hidden bg-gradient-to-b from-tuft-yellow/40 via-tuft-yellow/20 to-soft-bg px-6 py-28"
     >
-      <CloudPuff
-        parallax={0.15}
-        className="pointer-events-none absolute -left-24 bottom-20 w-[380px] text-tuft-orange/30"
-      />
-      <CloudPuff
-        parallax={-0.12}
-        className="pointer-events-none absolute -right-20 top-16 w-[320px] -scale-x-100 text-tuft-lime/35"
-      />
-      <FlowerDecal className="pointer-events-none absolute right-[8%] bottom-16 w-24 opacity-60" />
+      <ScatteredLittleFlowers spots={contactLittleFlowers} />
 
       <div className="relative z-[1] mx-auto max-w-3xl text-center">
         <motion.div
@@ -494,7 +533,8 @@ export default function App() {
   };
 
   return (
-    <div className="page-grain min-h-screen font-sans selection:bg-tuft-magenta selection:text-white">
+    <div className="page-grain relative min-h-screen font-sans selection:bg-tuft-magenta selection:text-white">
+      <GroovyWaveBackground />
       <Navbar onContactClick={scrollToContact} />
       <main className="relative z-[1]">
         <Hero />
@@ -515,14 +555,7 @@ export default function App() {
               </span>
             ))}
           </motion.div>
-          {/* Flower accents */}
-          <FlowerDecal className="pointer-events-none absolute left-[3%] top-1/2 w-24 -translate-y-1/2 opacity-50 md:w-32" />
-          <FlowerDecal className="pointer-events-none absolute right-[3%] top-1/2 w-24 -translate-y-1/2 rotate-45 opacity-50 md:w-32" />
-          <CloudPuff
-            center
-            parallax={0.1}
-            className="pointer-events-none absolute -bottom-8 left-1/2 w-[340px] text-tuft-lime/20"
-          />
+          <ScatteredLittleFlowers spots={tealBannerLittleFlowers} />
           <div className="relative z-10 mx-auto max-w-4xl py-10">
             <h2 className="mb-8 font-sans text-4xl leading-tight text-white md:text-6xl">
               Bringing{' '}
