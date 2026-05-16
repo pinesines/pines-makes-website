@@ -23,7 +23,7 @@ serve-docs: ## python http.server with /pines-makes-website/ → docs/ (same bas
 	  printf 'Open: http://127.0.0.1:8888/pines-makes-website/\n'; \
 	  cd "$$tmpdir" && python3 -m http.server 8888 --bind 127.0.0.1
 
-deploy: ## git add ., commit with UTC ISO timestamp message, push origin main (GitHub Pages)
+deploy: build ## git add ., commit with UTC ISO timestamp message, push origin main (GitHub Pages)
 	git add .
 	git commit -m "$$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 	git push origin main
