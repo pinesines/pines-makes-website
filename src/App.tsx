@@ -34,10 +34,13 @@ function BubbleDisplayTitle({
   text,
   as,
   className = '',
+  letterClassName,
 }: {
   text: string;
   as: 'h1' | 'h2' | 'h3';
   className?: string;
+  /** Per-letter Tailwind colour (default: `HERO_LOGO_LETTER_COLOR`) */
+  letterClassName?: string;
 }) {
   const upper = text.toUpperCase();
   const Comp = as;
@@ -52,7 +55,10 @@ function BubbleDisplayTitle({
           return <span key={i} className="inline-block w-[0.22em] md:w-[0.3em]" aria-hidden />;
         }
         return (
-          <span key={i} className={`hero-bubble-letter ${HERO_LOGO_LETTER_COLOR}`}>
+          <span
+            key={i}
+            className={`hero-bubble-letter ${letterClassName ?? HERO_LOGO_LETTER_COLOR}`}
+          >
             {ch}
           </span>
         );
@@ -61,19 +67,14 @@ function BubbleDisplayTitle({
   );
 }
 
-/** One rounded petal, tip toward top (−Y); rotates around 100,100 (5-fold symmetry) */
+/** One rounded petal, tip toward top (−Y); rotates around 100,100 (5-fold symmetry).
+ * Symmetrical halves + larger hub circle mask the basal join cleanly when repeated ×5. */
 const FLOWER_PETAL_5_D =
   'M 100 34 C 118 44 126 72 116 90 C 110 96 104 99 100 100 C 96 99 90 96 84 90 C 74 72 82 44 100 34 Z';
 
-/** Simple paired leaves below the bloom */
-const FLOWER_LEAF_LEFT_D =
-  'M 100 101 C 88 104 74 118 72 136 C 69 152 79 160 88 150 C 94 140 98 118 100 106 Z';
-const FLOWER_LEAF_RIGHT_D =
-  'M 100 101 C 112 104 126 118 128 136 C 131 152 121 160 112 150 C 106 140 102 118 100 106 Z';
-
 const PETAL_ROTATIONS_5 = [0, 72, 144, 216, 288];
 
-/** Small five-petal flower with leaves (scattered accents) */
+/** Small five-petal flower (scattered accents) */
 function FlowerDecal({
   className,
   colors,
@@ -83,18 +84,17 @@ function FlowerDecal({
 }) {
   const petal = colors?.petal ?? '#ff7a1a';
   const center = colors?.center ?? '#ff7a1a';
-  const leaf = colors?.leaf ?? '#0d9e90';
-  const leafAlt = colors?.leafAlt ?? '#067a6f';
 
   return (
     <svg className={className} viewBox="0 0 200 200" aria-hidden>
       <g style={{ transformOrigin: '100px 100px' }}>
-        <path d={FLOWER_LEAF_LEFT_D} fill={leaf} />
-        <path d={FLOWER_LEAF_RIGHT_D} fill={leafAlt} />
-        {PETAL_ROTATIONS_5.map((deg) => (
-          <path key={deg} d={FLOWER_PETAL_5_D} fill={petal} transform={`rotate(${deg} 100 100)`} />
-        ))}
-        <circle cx="100" cy="100" r="18" fill={center} />
+        {/* Centered scale reads slightly fuller without distorting rotations */}
+        <g transform="translate(100 100) scale(1.1) translate(-100 -100)">
+          {PETAL_ROTATIONS_5.map((deg) => (
+            <path key={deg} d={FLOWER_PETAL_5_D} fill={petal} transform={`rotate(${deg} 100 100)`} />
+          ))}
+          <circle cx="100" cy="100" r="21" fill={center} />
+        </g>
       </g>
     </svg>
   );
@@ -158,50 +158,82 @@ const FLOWER_ON_TEAL = {
 } as const;
 
 const heroLittleFlowers: FlowerSpot[] = [
-  { className: 'left-[5%] top-[8%] w-12 opacity-45 -rotate-[18deg]', colors: FLOWER_ACCENTS.pink },
-  { className: 'left-[14%] top-[22%] w-14 opacity-35 rotate-6', colors: FLOWER_ACCENTS.yellow },
-  { className: 'right-[7%] top-[12%] w-14 opacity-40 rotate-12', colors: FLOWER_ACCENTS.lilac },
-  { className: 'right-[18%] top-[28%] w-12 opacity-30 -rotate-8', colors: FLOWER_ACCENTS.mint },
-  { className: 'left-[8%] top-[42%] w-12 opacity-35 rotate-[22deg]', colors: FLOWER_ACCENTS.blue },
-  { className: 'right-[6%] top-[48%] w-12 opacity-35 -rotate-6', colors: FLOWER_ACCENTS.pink },
-  { className: 'left-[3%] bottom-[28%] w-12 opacity-40 -rotate-12', colors: FLOWER_ACCENTS.yellow },
-  { className: 'left-[20%] bottom-[18%] w-14 opacity-30 rotate-9', colors: FLOWER_ACCENTS.lilac },
-  { className: 'right-[4%] bottom-[22%] w-11 opacity-45 rotate-[14deg]', colors: FLOWER_ACCENTS.mint },
-  { className: 'right-[16%] bottom-[10%] w-14 opacity-35 -rotate-[10deg]', colors: FLOWER_ACCENTS.blue },
-  { className: 'left-[42%] top-[6%] w-10 opacity-25 -rotate-45 hidden sm:block', colors: FLOWER_ACCENTS.pink },
-  { className: 'right-[40%] bottom-[14%] w-10 opacity-25 rotate-12 hidden sm:block', colors: FLOWER_ACCENTS.yellow },
+  { className: 'left-[5%] top-[8%] w-16 opacity-45 -rotate-[18deg]', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[14%] top-[22%] w-20 opacity-35 rotate-6', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[7%] top-[12%] w-20 opacity-40 rotate-12', colors: FLOWER_ACCENTS.lilac },
+  { className: 'right-[18%] top-[28%] w-16 opacity-30 -rotate-8', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[8%] top-[42%] w-16 opacity-35 rotate-[22deg]', colors: FLOWER_ACCENTS.blue },
+  { className: 'right-[6%] top-[48%] w-16 opacity-35 -rotate-6', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[3%] bottom-[28%] w-16 opacity-40 -rotate-12', colors: FLOWER_ACCENTS.yellow },
+  { className: 'left-[20%] bottom-[18%] w-20 opacity-30 rotate-9', colors: FLOWER_ACCENTS.lilac },
+  { className: 'right-[4%] bottom-[22%] w-14 opacity-45 rotate-[14deg]', colors: FLOWER_ACCENTS.mint },
+  { className: 'right-[16%] bottom-[10%] w-20 opacity-35 -rotate-[10deg]', colors: FLOWER_ACCENTS.blue },
+  { className: 'left-[42%] top-[6%] w-12 opacity-25 -rotate-45 hidden sm:block', colors: FLOWER_ACCENTS.pink },
+  { className: 'right-[40%] bottom-[14%] w-12 opacity-25 rotate-12 hidden sm:block', colors: FLOWER_ACCENTS.yellow },
+  { className: 'left-[52%] top-[24%] w-14 opacity-22 rotate-[12deg] hidden md:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'right-[52%] top-[38%] w-14 opacity-20 -rotate-9 hidden lg:block', colors: FLOWER_ACCENTS.lilac },
+  { className: 'left-[46%] bottom-[8%] w-14 opacity-24 rotate-[8deg] hidden md:block', colors: FLOWER_ACCENTS.blue },
+  { className: 'right-[30%] top-[62%] w-14 opacity-18 -rotate-12 hidden xl:block', colors: FLOWER_ACCENTS.yellow },
+  { className: 'left-[26%] top-[62%] w-14 opacity-20 rotate-[16deg] hidden xl:block', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[92%] top-[36%] w-14 opacity-25 -rotate-6 hidden xl:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[54%] top-[14%] w-12 opacity-18 rotate-[20deg] hidden lg:block', colors: FLOWER_ACCENTS.blue },
 ];
 
 const galleryLittleFlowers: FlowerSpot[] = [
-  { className: 'left-[4%] top-[6%] w-12 opacity-35 -rotate-12', colors: FLOWER_ACCENTS.lilac },
-  { className: 'left-[12%] top-[32%] w-11 opacity-30 rotate-9 hidden lg:block', colors: FLOWER_ACCENTS.mint },
-  { className: 'right-[8%] top-[14%] w-12 opacity-35 rotate-6', colors: FLOWER_ACCENTS.blue },
-  { className: 'right-[3%] top-[48%] w-11 opacity-25 -rotate-[16deg]', colors: FLOWER_ACCENTS.pink },
-  { className: 'left-[6%] bottom-[20%] w-12 opacity-30 rotate-12', colors: FLOWER_ACCENTS.yellow },
-  { className: 'right-[14%] bottom-[8%] w-14 opacity-35 -rotate-6', colors: FLOWER_ACCENTS.lilac },
-  { className: 'left-[35%] top-[18%] w-10 opacity-20 rotate-45 hidden md:block', colors: FLOWER_ACCENTS.mint },
-  { className: 'right-[38%] bottom-[24%] w-10 opacity-22 -rotate-12 hidden md:block', colors: FLOWER_ACCENTS.blue },
+  { className: 'left-[4%] top-[6%] w-16 opacity-35 -rotate-12', colors: FLOWER_ACCENTS.lilac },
+  { className: 'left-[12%] top-[32%] w-14 opacity-30 rotate-9 hidden lg:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'right-[8%] top-[14%] w-16 opacity-35 rotate-6', colors: FLOWER_ACCENTS.blue },
+  { className: 'right-[3%] top-[48%] w-14 opacity-25 -rotate-[16deg]', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[6%] bottom-[20%] w-16 opacity-30 rotate-12', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[14%] bottom-[8%] w-20 opacity-35 -rotate-6', colors: FLOWER_ACCENTS.lilac },
+  { className: 'left-[35%] top-[18%] w-12 opacity-20 rotate-45 hidden md:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'right-[38%] bottom-[24%] w-12 opacity-22 -rotate-12 hidden md:block', colors: FLOWER_ACCENTS.blue },
+  { className: 'left-[52%] top-[8%] w-14 opacity-22 rotate-10 hidden lg:block', colors: FLOWER_ACCENTS.pink },
+  { className: 'right-[48%] bottom-[42%] w-14 opacity-18 -rotate-8 hidden xl:block', colors: FLOWER_ACCENTS.yellow },
+  { className: 'left-[92%] top-[22%] w-14 opacity-24 rotate-[14deg] hidden md:block', colors: FLOWER_ACCENTS.lilac },
+  { className: 'right-[94%] bottom-[18%] w-14 opacity-20 -rotate-10 hidden xl:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[72%] top-[58%] w-14 opacity-16 rotate-[22deg] hidden lg:block', colors: FLOWER_ACCENTS.blue },
+  { className: 'left-[30%] bottom-[46%] w-14 opacity-18 -rotate-6 hidden xl:block', colors: FLOWER_ACCENTS.pink },
 ];
 
 const contactLittleFlowers: FlowerSpot[] = [
-  { className: 'left-[4%] top-[10%] w-12 opacity-40 -rotate-10', colors: FLOWER_ACCENTS.pink },
-  { className: 'left-[16%] top-[22%] w-14 opacity-35 rotate-8', colors: FLOWER_ACCENTS.yellow },
-  { className: 'right-[6%] top-[14%] w-12 opacity-35 rotate-12', colors: FLOWER_ACCENTS.lilac },
-  { className: 'right-[15%] top-[8%] w-11 opacity-30 -rotate-6', colors: FLOWER_ACCENTS.mint },
-  { className: 'left-[8%] bottom-[30%] w-12 opacity-35 rotate-[18deg]', colors: FLOWER_ACCENTS.blue },
-  { className: 'left-[22%] bottom-[12%] w-11 opacity-30 -rotate-12', colors: FLOWER_ACCENTS.pink },
-  { className: 'right-[5%] bottom-[18%] w-14 opacity-40 -rotate-9', colors: FLOWER_ACCENTS.yellow },
-  { className: 'right-[20%] bottom-[8%] w-12 opacity-35 rotate-6', colors: FLOWER_ACCENTS.lilac },
-  { className: 'left-[45%] top-[6%] w-10 opacity-25 rotate-45 hidden sm:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[4%] top-[10%] w-16 opacity-40 -rotate-10', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[16%] top-[22%] w-20 opacity-35 rotate-8', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[6%] top-[14%] w-16 opacity-35 rotate-12', colors: FLOWER_ACCENTS.lilac },
+  { className: 'right-[15%] top-[8%] w-14 opacity-30 -rotate-6', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[8%] bottom-[30%] w-16 opacity-35 rotate-[18deg]', colors: FLOWER_ACCENTS.blue },
+  { className: 'left-[22%] bottom-[12%] w-14 opacity-30 -rotate-12', colors: FLOWER_ACCENTS.pink },
+  { className: 'right-[5%] bottom-[18%] w-20 opacity-40 -rotate-9', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[20%] bottom-[8%] w-16 opacity-35 rotate-6', colors: FLOWER_ACCENTS.lilac },
+  { className: 'left-[45%] top-[6%] w-12 opacity-25 rotate-45 hidden sm:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[50%] bottom-[42%] w-14 opacity-22 rotate-[15deg] hidden md:block', colors: FLOWER_ACCENTS.blue },
+  { className: 'right-[92%] top-[30%] w-14 opacity-28 -rotate-8 hidden xl:block', colors: FLOWER_ACCENTS.pink },
+  { className: 'left-[94%] top-[58%] w-14 opacity-24 rotate-10 hidden lg:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[72%] top-[18%] w-14 opacity-20 -rotate-12 hidden xl:block', colors: FLOWER_ACCENTS.lilac },
+  { className: 'right-[72%] bottom-[22%] w-14 opacity-22 rotate-[18deg] hidden lg:block', colors: FLOWER_ACCENTS.yellow },
+  { className: 'left-[30%] top-[78%] w-14 opacity-18 rotate-10 hidden xl:block', colors: FLOWER_ACCENTS.blue },
 ];
 
 const tealBannerLittleFlowers: FlowerSpot[] = [
-  { className: 'left-[5%] top-[18%] w-12 opacity-45 -rotate-12', colors: FLOWER_ON_TEAL.pink },
-  { className: 'left-[14%] bottom-[22%] w-11 opacity-40 rotate-9', colors: FLOWER_ON_TEAL.yellow },
-  { className: 'right-[7%] top-[20%] w-12 opacity-45 rotate-6', colors: FLOWER_ON_TEAL.lilac },
-  { className: 'right-[18%] bottom-[26%] w-12 opacity-40 -rotate-[14deg]', colors: FLOWER_ON_TEAL.mint },
-  { className: 'left-[32%] top-[12%] w-10 opacity-35 rotate-45 hidden md:block', colors: FLOWER_ON_TEAL.blue },
-  { className: 'right-[35%] bottom-[14%] w-10 opacity-35 -rotate-6 hidden md:block', colors: FLOWER_ON_TEAL.pink },
+  { className: 'left-[5%] top-[18%] w-16 opacity-45 -rotate-12', colors: FLOWER_ON_TEAL.pink },
+  { className: 'left-[14%] bottom-[22%] w-14 opacity-40 rotate-9', colors: FLOWER_ON_TEAL.yellow },
+  { className: 'right-[7%] top-[20%] w-16 opacity-45 rotate-6', colors: FLOWER_ON_TEAL.lilac },
+  { className: 'right-[18%] bottom-[26%] w-16 opacity-40 -rotate-[14deg]', colors: FLOWER_ON_TEAL.mint },
+  { className: 'left-[32%] top-[12%] w-12 opacity-35 rotate-45 hidden md:block', colors: FLOWER_ON_TEAL.blue },
+  { className: 'right-[35%] bottom-[14%] w-12 opacity-35 -rotate-6 hidden md:block', colors: FLOWER_ON_TEAL.pink },
+  { className: 'left-[48%] top-[28%] w-14 opacity-35 rotate-[18deg] hidden lg:block', colors: FLOWER_ON_TEAL.yellow },
+  { className: 'right-[52%] bottom-[42%] w-14 opacity-32 -rotate-10 hidden xl:block', colors: FLOWER_ON_TEAL.blue },
+  { className: 'left-[94%] top-[22%] w-14 opacity-38 rotate-[12deg]', colors: FLOWER_ON_TEAL.mint },
+  { className: 'left-[8%] top-[72%] w-14 opacity-36 -rotate-8 hidden md:block', colors: FLOWER_ON_TEAL.lilac },
+  { className: 'right-[94%] bottom-[62%] w-14 opacity-34 rotate-[20deg]', colors: FLOWER_ON_TEAL.pink },
+];
+
+/** Soft footer blossoms — toned down behind links */
+const footerLittleFlowers: FlowerSpot[] = [
+  { className: 'left-[8%] top-[42%] w-14 opacity-18 -rotate-12 hidden sm:block', colors: FLOWER_ACCENTS.lilac },
+  { className: 'left-[92%] top-[38%] w-14 opacity-16 rotate-10 hidden md:block', colors: FLOWER_ACCENTS.mint },
+  { className: 'left-[44%] top-[18%] w-14 opacity-15 -rotate-[8deg]', colors: FLOWER_ACCENTS.yellow },
+  { className: 'right-[32%] bottom-[12%] w-14 opacity-16 rotate-[16deg]', colors: FLOWER_ACCENTS.blue },
 ];
 
 const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
@@ -211,7 +243,7 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
     'font-sans text-xs font-normal uppercase tracking-[0.22em] text-stone-900 transition-colors hover:text-tuft-orange md:text-[13px]';
 
   const primaryBtnClass =
-    'font-sans cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-orange px-5 py-2.5 text-xs font-normal uppercase tracking-[0.2em] text-white shadow-[3px_3px_0_0_#0f0f0f] transition-[transform,box-shadow,background-color] hover:bg-tuft-magenta hover:shadow-[2px_2px_0_0_#0f0f0f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none md:px-6 md:text-[13px]';
+    'font-sans cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-magenta px-5 py-2.5 text-xs font-normal uppercase tracking-[0.2em] text-white shadow-[3px_3px_0_0_#0f0f0f] transition-[transform,box-shadow,background-color] hover:bg-tuft-orange hover:shadow-[2px_2px_0_0_#0f0f0f] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none md:px-6 md:text-[13px]';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-4 pt-4 font-sans">
@@ -224,11 +256,8 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
           <a href="#" className={navLinkClass}>
             Gallery
           </a>
-          <a href="#" className={navLinkClass}>
-            Process
-          </a>
           <button type="button" onClick={onContactClick} className={primaryBtnClass}>
-            Order Custom
+            GET IN TOUCH
           </button>
         </div>
 
@@ -258,9 +287,6 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
               </a>
               <a href="#" onClick={() => setIsOpen(false)} className={`${navLinkClass} text-base`}>
                 Gallery
-              </a>
-              <a href="#" onClick={() => setIsOpen(false)} className={`${navLinkClass} text-base`}>
-                Process
               </a>
               <button
                 type="button"
@@ -294,6 +320,7 @@ const Hero = () => {
         <BubbleDisplayTitle
           text="Pines Makes"
           as="h1"
+          letterClassName="text-tuft-peachy-rich"
           className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[9.5rem]"
         />
       </motion.div>
@@ -305,7 +332,7 @@ const Hero = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="mb-6 inline-block rounded-sm border-2 border-stone-900 bg-tuft-yellow px-4 py-1.5 font-sans text-[10px] font-normal uppercase tracking-[0.28em] text-stone-900 shadow-[3px_3px_0_0_#0f0f0f] md:px-5 md:text-xs">
+            <div className="mb-6 inline-block rounded-sm border-2 border-stone-900 bg-tuft-yellow px-5 py-2 font-sans text-xs font-normal uppercase tracking-[0.28em] text-stone-900 shadow-[3px_3px_0_0_#0f0f0f] sm:px-6 sm:text-sm md:px-8 md:py-2.5 md:text-[15px]">
               Handcrafted Tufted Art
             </div>
             <h2 className="mb-8 font-sans text-5xl leading-[0.95] text-stone-900 md:text-7xl lg:text-8xl">
@@ -577,26 +604,29 @@ export default function App() {
         <Contact id="contact-section" />
       </main>
 
-      <footer className="relative z-[1] mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 border-t border-tuft-magenta/10 px-6 py-12 text-sm text-stone-500 font-sans md:flex-row">
-        <img
-          src={`${STATIC_BASE}font-2.png`}
-          alt="Pines Makes"
-          className="h-10 w-auto object-contain md:h-11"
-          width={1024}
-          height={1024}
-        />
-        <div className="flex gap-8 text-xs font-bold tracking-widest uppercase">
-          <a href="#" className="transition-colors hover:text-tuft-teal">
-            Privacy
-          </a>
-          <a href="#" className="transition-colors hover:text-tuft-teal">
-            Terms
-          </a>
-          <a href="#" className="transition-colors hover:text-tuft-teal">
-            Shipping
-          </a>
+      <footer className="relative z-[1] mx-auto overflow-hidden border-t border-tuft-magenta/10 px-6 py-12 text-sm text-stone-500 font-sans">
+        <ScatteredLittleFlowers spots={footerLittleFlowers} />
+        <div className="relative z-[2] mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 md:flex-row">
+          <img
+            src={`${STATIC_BASE}font-2.png`}
+            alt="Pines Makes"
+            className="h-10 w-auto object-contain md:h-11"
+            width={1024}
+            height={1024}
+          />
+          <div className="flex gap-8 text-xs font-bold tracking-widest uppercase">
+            <a href="#" className="transition-colors hover:text-tuft-teal">
+              Privacy
+            </a>
+            <a href="#" className="transition-colors hover:text-tuft-teal">
+              Terms
+            </a>
+            <a href="#" className="transition-colors hover:text-tuft-teal">
+              Shipping
+            </a>
+          </div>
+          <div className="text-center md:text-right">© 2026 PINES MAKES STUDIO. ALL RIGHTS RESERVED.</div>
         </div>
-        <div className="text-center md:text-right">© 2026 PINES MAKES STUDIO. ALL RIGHTS RESERVED.</div>
       </footer>
     </div>
   );
