@@ -6,6 +6,8 @@
   --font-bubble: "Modak", ui-rounded, system-ui, sans-serif;
 
   --color-tuft-peachy-rich: #ffa98a;
+  /** Hero logotype — warmer coral-orange */
+  --color-tuft-coral: #ff7160;
 
   /* Rug + Mystery Machine palette */
   --color-tuft-magenta: #e11d74;
@@ -18,6 +20,8 @@
   --color-soft-bg: #fff8ec;
   /** Psychedelic wave backdrop (matches GroovyWaveBackground SVG) */
   --color-groovy-cream: #f7dc94;
+  /** Wave stripe pink — sync hex with `PINK` in GroovyWaveBackground.tsx */
+  --color-groovy-pink: #ff77c0;
 
   /* Legacy names map to tuft tokens for any remaining utilities */
   --color-pastel-pink: #e11d74;

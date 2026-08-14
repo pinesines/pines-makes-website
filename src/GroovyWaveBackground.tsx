@@ -1,4 +1,6 @@
-/** 70s-style parallel wave stripes — cream field + hot pink (inspired by reference art) */
+/** 70s-style parallel wave stripes — cream field + hot pink (inspired by reference art)
+ * Hex must stay in sync with `@theme --color-groovy-pink` in `index.css`.
+ */
 const CREAM = '#f7dc94';
 const PINK = '#ff77c0';
 
