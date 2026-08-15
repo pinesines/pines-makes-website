@@ -246,9 +246,9 @@ const Hero = () => {
         transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-[1] mb-10 flex justify-center px-4 md:mb-16"
       >
-        <h1 className="w-full max-w-[14rem] sm:max-w-[16rem] md:max-w-[18rem] lg:max-w-[20rem]">
+        <h1 className="w-full max-w-[16rem] sm:max-w-[18rem] md:max-w-[20rem] lg:max-w-[22rem]">
           <img
-            src={`${STATIC_BASE}pinesmakes-logo.png`}
+            src={`${STATIC_BASE}${encodeURIComponent('transparent logo.png')}`}
             alt="Pines Makes — Tufted Art"
             className="h-auto w-full object-contain"
             width={1024}

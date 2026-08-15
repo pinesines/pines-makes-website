@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { useLayoutEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { X } from 'lucide-react';
 import { ScatteredLittleFlowers } from './decorations';
 
@@ -13,6 +13,9 @@ function publicAsset(filename: string) {
 type GalleryItem = {
   id: number;
   title: string;
+  subtitle: string;
+  dimensions?: string;
+  material?: string;
   accent: string;
   blob: string;
   images: string[];
@@ -22,6 +25,9 @@ const galleryPageItems: GalleryItem[] = [
   {
     id: 1,
     title: 'Flower Dream',
+    subtitle: 'Tufted Wall Hanging',
+    dimensions: '71cm × 51cm',
+    material: 'Acrylic and wool blend',
     accent: 'ring-tuft-yellow/60',
     blob: 'blob-squish-1',
     images: ['Flower Dream 1.jpg', 'Flower Dream detail.jpg'],
@@ -29,6 +35,7 @@ const galleryPageItems: GalleryItem[] = [
   {
     id: 2,
     title: 'Happy Mirror',
+    subtitle: 'Tufted Wall Mirror',
     accent: 'ring-tuft-magenta/50',
     blob: 'blob-squish-2',
     images: ['Happy mirror.jpg', 'Happy mirror 2.jpg', 'Happy mirror detail.jpg'],
@@ -36,6 +43,7 @@ const galleryPageItems: GalleryItem[] = [
   {
     id: 3,
     title: 'Love Waves',
+    subtitle: 'Floor Rug',
     accent: 'ring-tuft-orange/50',
     blob: 'blob-squish-3',
     images: ['Love waves 1.jpg'],
@@ -43,6 +51,7 @@ const galleryPageItems: GalleryItem[] = [
   {
     id: 4,
     title: 'Retro Darkness',
+    subtitle: 'Floor Rug',
     accent: 'ring-tuft-teal/50',
     blob: 'blob-squish-4',
     images: ['Retro darkness.jpg'],
@@ -50,6 +59,7 @@ const galleryPageItems: GalleryItem[] = [
   {
     id: 5,
     title: 'Retro Bicolor',
+    subtitle: 'Tufted Flower Vase',
     accent: 'ring-tuft-lime/50',
     blob: 'blob-squish-1',
     images: ['Retro bicolor 1.jpg'],
@@ -57,6 +67,7 @@ const galleryPageItems: GalleryItem[] = [
   {
     id: 6,
     title: 'Retro Tricolor',
+    subtitle: 'Tufted Flower Vase',
     accent: 'ring-tuft-lilac/50',
     blob: 'blob-squish-2',
     images: ['Retro tricolor.jpg', 'Retro waves tricolor.jpg', 'Retro waves combo.jpg'],
@@ -64,6 +75,7 @@ const galleryPageItems: GalleryItem[] = [
   {
     id: 7,
     title: 'Small Retro',
+    subtitle: 'Tufted Flower Vase',
     accent: 'ring-tuft-coral/50',
     blob: 'blob-squish-3',
     images: ['Small retro.jpg'],
@@ -103,106 +115,141 @@ function GalleryCardBody({
   const coverImage = item.images[0];
   const displayedImage = item.images[isSelected ? activeImageIndex : 0] ?? coverImage;
   const hasVariations = item.images.length > 1;
+  const hasDetails = Boolean(item.dimensions || item.material);
 
-  return (
-    <div className={isSelected ? 'mx-auto max-w-4xl' : undefined}>
+  if (!isSelected) {
+    return (
+      <div>
         <button
           type="button"
-          aria-expanded={isSelected}
+          aria-expanded={false}
           onClick={() => onSelect(item.id)}
-          className={`group w-full cursor-pointer text-left ${isSelected ? '' : 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tuft-teal focus-visible:ring-offset-2'}`}
+          className="group w-full cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tuft-teal focus-visible:ring-offset-2"
         >
-          <motion.div
-            layout
-            className={`blob-inflate relative mb-6 overflow-hidden ring-4 ${item.blob} ${item.accent} transition-[transform,box-shadow] duration-300 ease-out ${
-              isSelected
-                ? 'mx-auto aspect-[4/5] w-full max-w-lg shadow-[0_28px_60px_-20px_rgb(45_30_50_0.28)]'
-                : 'aspect-[4/5] group-hover:scale-[1.04] group-hover:shadow-[0_24px_52px_-18px_rgb(45_30_50_0.26)]'
-            }`}
+          <div
+            className={`blob-inflate relative mb-6 aspect-[4/5] overflow-hidden ring-4 ${item.blob} ${item.accent} transition-shadow duration-200 group-hover:shadow-[0_20px_44px_-18px_rgb(45_30_50_0.22)]`}
           >
-            <motion.img
-              key={displayedImage}
+            <img
               src={publicAsset(displayedImage)}
               alt={item.title}
-              initial={{ opacity: 0.85 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.25 }}
               className="h-full w-full object-cover"
             />
-            {isSelected && (
-              <span className="absolute right-3 top-3 rounded-sm border-2 border-stone-900 bg-white/90 p-1.5 text-stone-900 shadow-[2px_2px_0_0_#0f0f0f]">
-                <X size={16} strokeWidth={2.5} aria-hidden />
-              </span>
-            )}
-          </motion.div>
+          </div>
         </button>
 
-        <AnimatePresence initial={false}>
-          {isSelected && hasVariations && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="overflow-hidden"
-            >
-              <p className="mb-4 font-sans text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
-                Variations
-              </p>
-              <div className="mb-8 flex flex-wrap justify-center gap-4 sm:justify-start">
-                {item.images.map((file, imageIndex) => {
-                  const isActive = imageIndex === activeImageIndex;
-                  return (
-                    <button
-                      key={file}
-                      type="button"
-                      aria-label={`${item.title} — ${variationLabel(file, imageIndex)}`}
-                      aria-pressed={isActive}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onActiveImageChange(imageIndex);
-                      }}
-                      className="cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tuft-teal focus-visible:ring-offset-2"
-                    >
-                      <div
-                        className={`blob-inflate blob-squish-1 relative aspect-[4/5] w-24 overflow-hidden ring-4 transition-[transform,box-shadow] duration-300 sm:w-28 ${
-                          isActive
-                            ? `${item.accent} scale-[1.03] shadow-[0_16px_36px_-14px_rgb(45_30_50_0.28)]`
-                            : 'ring-stone-200 hover:scale-[1.04] hover:ring-stone-300'
-                        }`}
-                      >
-                        <img
-                          src={publicAsset(file)}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <span
-                        className={`mt-2 block text-center font-sans text-[10px] font-bold uppercase tracking-widest ${
-                          isActive ? 'text-stone-900' : 'text-stone-400'
-                        }`}
-                      >
-                        {variationLabel(file, imageIndex)}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className={isSelected ? 'text-center sm:text-left' : undefined}>
+        <div>
           <h2 className="mb-1 font-sans text-2xl text-stone-900">{item.title}</h2>
           <p className="font-sans text-sm font-semibold uppercase tracking-widest text-stone-400">
-            Tufted Wall Hanging
+            {item.subtitle}
           </p>
-          {!isSelected && hasVariations && (
+          {hasVariations && (
             <p className="mt-2 font-sans text-xs uppercase tracking-[0.22em] text-stone-500">
               Click to view {item.images.length} photos
             </p>
           )}
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-5xl">
+      <div className="grid items-start gap-10 md:grid-cols-2 md:gap-12 lg:gap-16">
+        <button
+          type="button"
+          aria-expanded
+          onClick={() => onSelect(item.id)}
+          className="group w-full cursor-pointer text-left"
+        >
+          <div
+            className={`blob-inflate relative aspect-[4/5] w-full max-w-lg overflow-hidden ring-4 ${item.blob} ${item.accent} shadow-[0_28px_60px_-20px_rgb(45_30_50_0.28)] transition-shadow duration-200 md:max-w-none`}
+          >
+            <img
+              src={publicAsset(displayedImage)}
+              alt={item.title}
+              className="h-full w-full object-cover"
+            />
+            <span className="absolute right-3 top-3 rounded-sm border-2 border-stone-900 bg-white/90 p-1.5 text-stone-900 shadow-[2px_2px_0_0_#0f0f0f]">
+              <X size={16} strokeWidth={2.5} aria-hidden />
+            </span>
+          </div>
+        </button>
+
+        <div className="text-left md:pt-6">
+          <h2 className="mb-2 font-sans text-3xl text-stone-900 md:text-4xl">{item.title}</h2>
+          <p className="mb-8 font-sans text-sm font-semibold uppercase tracking-widest text-stone-400">
+            {item.subtitle}
+          </p>
+
+          {hasDetails && (
+            <dl className="space-y-5 font-sans">
+              {item.dimensions && (
+                <div>
+                  <dt className="mb-1 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+                    Dimensions
+                  </dt>
+                  <dd className="text-lg text-stone-800">{item.dimensions}</dd>
+                </div>
+              )}
+              {item.material && (
+                <div>
+                  <dt className="mb-1 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+                    Material
+                  </dt>
+                  <dd className="text-lg leading-relaxed text-stone-800">{item.material}</dd>
+                </div>
+              )}
+            </dl>
+          )}
+        </div>
+      </div>
+
+      {hasVariations && (
+        <div className="mt-10 w-full">
+          <p className="mb-4 text-center font-sans text-xs font-bold uppercase tracking-[0.28em] text-stone-500 md:text-left">
+            Variations
+          </p>
+          <div className="mb-8 flex flex-wrap justify-center gap-4 md:justify-start">
+              {item.images.map((file, imageIndex) => {
+                const isActive = imageIndex === activeImageIndex;
+                return (
+                  <button
+                    key={file}
+                    type="button"
+                    aria-label={`${item.title} — ${variationLabel(file, imageIndex)}`}
+                    aria-pressed={isActive}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onActiveImageChange(imageIndex);
+                    }}
+                    className="cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tuft-teal focus-visible:ring-offset-2"
+                  >
+                    <div
+                      className={`blob-inflate blob-squish-1 relative aspect-[4/5] w-24 overflow-hidden ring-4 transition-shadow duration-200 sm:w-28 ${
+                        isActive
+                          ? `${item.accent} shadow-[0_16px_36px_-14px_rgb(45_30_50_0.28)]`
+                          : 'ring-stone-200 hover:ring-stone-300'
+                      }`}
+                    >
+                      <img
+                        src={publicAsset(file)}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <span
+                      className={`mt-2 block text-center font-sans text-[10px] font-bold uppercase tracking-widest ${
+                        isActive ? 'text-stone-900' : 'text-stone-400'
+                      }`}
+                    >
+                      {variationLabel(file, imageIndex)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
     </div>
   );
 }
@@ -210,6 +257,30 @@ function GalleryCardBody({
 export function GalleryPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  useLayoutEffect(() => {
+    if (selectedId === null) return;
+
+    let cancelled = false;
+
+    const scrollToSelected = () => {
+      if (cancelled) return;
+      document.getElementById(`gallery-item-${selectedId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    };
+
+    scrollToSelected();
+    const raf = requestAnimationFrame(scrollToSelected);
+    const timer = window.setTimeout(scrollToSelected, 150);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+    };
+  }, [selectedId]);
 
   const handleSelect = (id: number) => {
     if (selectedId === id) {
@@ -242,19 +313,19 @@ export function GalleryPage() {
               </div>
             </div>
 
-            <motion.div layout className="grid grid-cols-1 gap-14 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-14 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {galleryPageItems.map((item, i) => {
                 const isSelected = selectedId === item.id;
 
                 return (
                   <motion.article
                     key={item.id}
-                    layout
-                    initial={{ opacity: 0, y: 28 }}
+                    id={`gallery-item-${item.id}`}
+                    initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.06, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    className={isSelected ? 'col-span-full' : undefined}
+                    transition={{ delay: i * 0.04, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className={`scroll-mt-28 ${isSelected ? 'col-span-full flex justify-center' : ''}`}
                   >
                     <GalleryCardBody
                       item={item}
@@ -266,7 +337,7 @@ export function GalleryPage() {
                   </motion.article>
                 );
               })}
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
