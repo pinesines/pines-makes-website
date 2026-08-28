@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { X } from 'lucide-react';
 import { ScatteredLittleFlowers } from './decorations';
@@ -257,23 +257,30 @@ function GalleryCardBody({
 export function GalleryPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const scrollYBeforeSelectRef = useRef<number | null>(null);
 
   useLayoutEffect(() => {
-    if (selectedId === null) return;
-
     let cancelled = false;
 
-    const scrollToSelected = () => {
+    const scrollToTarget = () => {
       if (cancelled) return;
-      document.getElementById(`gallery-item-${selectedId}`)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+
+      if (selectedId !== null) {
+        document.getElementById(`gallery-item-${selectedId}`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+        return;
+      }
+
+      const savedY = scrollYBeforeSelectRef.current;
+      if (savedY === null) return;
+      window.scrollTo({ top: savedY, behavior: 'auto' });
     };
 
-    scrollToSelected();
-    const raf = requestAnimationFrame(scrollToSelected);
-    const timer = window.setTimeout(scrollToSelected, 150);
+    scrollToTarget();
+    const raf = requestAnimationFrame(scrollToTarget);
+    const timer = window.setTimeout(scrollToTarget, 150);
 
     return () => {
       cancelled = true;
@@ -287,6 +294,10 @@ export function GalleryPage() {
       setSelectedId(null);
       setActiveImageIndex(0);
       return;
+    }
+
+    if (selectedId === null) {
+      scrollYBeforeSelectRef.current = window.scrollY;
     }
 
     setSelectedId(id);

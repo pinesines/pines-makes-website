@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Mail, ArrowRight, Menu, X } from 'lucide-react';
 import { BrowserRouter, Link, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -8,6 +8,96 @@ import { GroovyWaveBackground } from './GroovyWaveBackground';
 
 /** Vite base path — `'/'` in dev, `'/pines-makes-website/'` in production Pages build */
 const STATIC_BASE = import.meta.env.BASE_URL;
+
+function publicAsset(filename: string) {
+  return `${STATIC_BASE}${encodeURI(filename)}`;
+}
+
+function HeroPieceImage({
+  src,
+  alt,
+  id,
+  className = '',
+  shape = 'organic',
+}: {
+  src: string;
+  alt: string;
+  id?: string;
+  className?: string;
+  shape?: 'organic' | 'round';
+}) {
+  if (shape === 'round') {
+    return (
+      <div className={`relative aspect-square ${className}`}>
+        <div className="absolute -inset-3 -z-20 rounded-full bg-tuft-yellow/50" />
+        <div className="absolute -inset-2 -z-10 rounded-full bg-tuft-lilac/25" />
+        <div className="relative h-full w-full overflow-hidden rounded-full shadow-[0_28px_60px_-20px_rgb(45_30_50_0.22),0_12px_24px_-12px_rgb(45_30_50_0.12)] ring-4 ring-white/80">
+          <img
+            src={src}
+            alt={alt}
+            className="h-full w-full object-cover"
+            style={{ clipPath: 'circle(50% at 50% 50%)' }}
+            id={id}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`relative aspect-square ${className}`}>
+      <div
+        className="absolute -inset-3 -z-20 rotate-6 bg-tuft-yellow/50"
+        style={{ borderRadius: '58% 42% 48% 52% / 52% 45% 55% 48%' }}
+      />
+      <div
+        className="absolute -inset-2 -z-10 -rotate-6 bg-tuft-lilac/25"
+        style={{ borderRadius: '45% 55% 62% 38% / 40% 55% 45% 60%' }}
+      />
+      <div
+        className="relative h-full w-full overflow-hidden shadow-[0_28px_60px_-20px_rgb(45_30_50_0.22),0_12px_24px_-12px_rgb(45_30_50_0.12)] ring-4 ring-white/80"
+        style={{ borderRadius: '46% 54% 52% 48% / 44% 48% 52% 56%' }}
+      >
+        <img src={src} alt={alt} className="h-full w-full object-cover" id={id} />
+      </div>
+    </div>
+  );
+}
+
+function HeroCascadeShowcase() {
+  return (
+    <div className="relative mx-auto w-full max-w-md pb-6 pt-2 sm:max-w-lg">
+      <div className="relative z-30 w-full rotate-[-3deg] translate-x-2 sm:translate-x-4">
+        <HeroPieceImage
+          src={publicAsset('cheech-rug-1.jpg')}
+          alt="Tufted wall art"
+          id="hero-image"
+          shape="round"
+          className="w-full"
+        />
+      </div>
+
+      <div className="relative z-20 mt-12 sm:mt-14">
+        <div className="relative left-1/2 flex w-[185%] -translate-x-1/2 gap-10 sm:gap-16">
+          <div className="min-w-0 flex-1 rotate-[4deg] -translate-x-3 sm:-translate-x-4">
+            <HeroPieceImage
+              src={publicAsset('Flower Dream detail.jpg')}
+              alt="Flower Dream detail"
+              className="w-full"
+            />
+          </div>
+          <div className="min-w-0 flex-1 rotate-[-5deg] translate-x-3 sm:translate-x-4">
+            <HeroPieceImage
+              src={publicAsset('Retro darkness.jpg')}
+              alt="Retro Darkness"
+              className="w-full"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /** Wavy section transition (1960s organic flow) */
 function WaveDivider({ className, flip }: { className?: string; flip?: boolean }) {
@@ -98,23 +188,6 @@ const heroLittleFlowers: FlowerSpot[] = [
   { className: 'left-[26%] top-[62%] w-14 opacity-20 rotate-[16deg] hidden xl:block', colors: FLOWER_ACCENTS.pink },
   { className: 'left-[92%] top-[36%] w-14 opacity-25 -rotate-6 hidden xl:block', colors: FLOWER_ACCENTS.mint },
   { className: 'left-[54%] top-[14%] w-12 opacity-18 rotate-[20deg] hidden lg:block', colors: FLOWER_ACCENTS.blue },
-];
-
-const galleryLittleFlowers: FlowerSpot[] = [
-  { className: 'left-[4%] top-[6%] w-16 opacity-35 -rotate-12', colors: FLOWER_ACCENTS.lilac },
-  { className: 'left-[12%] top-[32%] w-14 opacity-30 rotate-9 hidden lg:block', colors: FLOWER_ACCENTS.mint },
-  { className: 'right-[8%] top-[14%] w-16 opacity-35 rotate-6', colors: FLOWER_ACCENTS.blue },
-  { className: 'right-[3%] top-[48%] w-14 opacity-25 -rotate-[16deg]', colors: FLOWER_ACCENTS.pink },
-  { className: 'left-[6%] bottom-[20%] w-16 opacity-30 rotate-12', colors: FLOWER_ACCENTS.yellow },
-  { className: 'right-[14%] bottom-[8%] w-20 opacity-35 -rotate-6', colors: FLOWER_ACCENTS.lilac },
-  { className: 'left-[35%] top-[18%] w-12 opacity-20 rotate-45 hidden md:block', colors: FLOWER_ACCENTS.mint },
-  { className: 'right-[38%] bottom-[24%] w-12 opacity-22 -rotate-12 hidden md:block', colors: FLOWER_ACCENTS.blue },
-  { className: 'left-[52%] top-[8%] w-14 opacity-22 rotate-10 hidden lg:block', colors: FLOWER_ACCENTS.pink },
-  { className: 'right-[48%] bottom-[42%] w-14 opacity-18 -rotate-8 hidden xl:block', colors: FLOWER_ACCENTS.yellow },
-  { className: 'left-[92%] top-[22%] w-14 opacity-24 rotate-[14deg] hidden md:block', colors: FLOWER_ACCENTS.lilac },
-  { className: 'right-[94%] bottom-[18%] w-14 opacity-20 -rotate-10 hidden xl:block', colors: FLOWER_ACCENTS.mint },
-  { className: 'left-[72%] top-[58%] w-14 opacity-16 rotate-[22deg] hidden lg:block', colors: FLOWER_ACCENTS.blue },
-  { className: 'left-[30%] bottom-[46%] w-14 opacity-18 -rotate-6 hidden xl:block', colors: FLOWER_ACCENTS.pink },
 ];
 
 const contactLittleFlowers: FlowerSpot[] = [
@@ -237,7 +310,7 @@ const Navbar = ({ onContactClick }: { onContactClick: () => void }) => {
 
 const Hero = () => {
   return (
-    <section className="relative overflow-hidden pt-32 pb-12">
+    <section className="relative pt-32 pb-12">
       <ScatteredLittleFlowers spots={heroLittleFlowers} />
 
       <motion.div
@@ -258,7 +331,7 @@ const Hero = () => {
       </motion.div>
 
       <div className="relative z-[1] mx-auto max-w-7xl px-6">
-        <div className="grid items-center gap-16 lg:grid-cols-2">
+        <div className="grid items-start gap-16 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -271,7 +344,7 @@ const Hero = () => {
               No Two Rugs Alike
             </h2>
             <p className="mb-10 max-w-md font-sans text-lg leading-relaxed text-stone-600">
-              Unique tufted wall hangings designed to bring warmth, color, and a touch of groovy retro
+              Unique tufted pieces designed to bring warmth, color, and a touch of cute groovy retro
               whimsy to your space.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -289,96 +362,10 @@ const Hero = () => {
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
-            className="relative mx-auto aspect-square w-full max-w-lg"
+            className="relative mx-auto w-full overflow-visible"
           >
-            <div
-              className="absolute -inset-3 -z-20 rotate-6 bg-tuft-yellow/50"
-              style={{ borderRadius: '58% 42% 48% 52% / 52% 45% 55% 48%' }}
-            />
-            <div
-              className="absolute -inset-2 -z-10 -rotate-6 bg-tuft-lilac/25"
-              style={{ borderRadius: '45% 55% 62% 38% / 40% 55% 45% 60%' }}
-            />
-            <div
-              className="relative h-full w-full overflow-hidden shadow-[0_28px_60px_-20px_rgb(45_30_50_0.22),0_12px_24px_-12px_rgb(45_30_50_0.12)] ring-4 ring-white/80"
-              style={{ borderRadius: '46% 54% 52% 48% / 44% 48% 52% 56%' }}
-            >
-              <img
-                src={`${STATIC_BASE}cheech-rug-1.jpg`}
-                alt="Tufted wall art"
-                className="h-full w-full object-cover"
-                id="hero-image"
-              />
-            </div>
+            <HeroCascadeShowcase />
           </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-/** Cream → white handoff into gallery */
-function HeroToGalleryWave() {
-  return (
-    <div className="bg-soft-bg">
-      <WaveDivider className="text-white" />
-    </div>
-  );
-}
-
-const galleryItems = [
-  { id: 1, title: 'Pastel Dream', accent: 'ring-tuft-yellow/60', blob: 'blob-squish-1', img: `${STATIC_BASE}rug-1.jpg` },
-  { id: 2, title: 'Soft Waves', accent: 'ring-tuft-magenta/50', blob: 'blob-squish-2', img: `${STATIC_BASE}rug-2.jpg` },
-  { id: 3, title: 'Retro Bloom', accent: 'ring-tuft-orange/50', blob: 'blob-squish-3', img: `${STATIC_BASE}rug-3.jpg` },
-  { id: 4, title: 'Sunset Tuft', accent: 'ring-tuft-teal/50', blob: 'blob-squish-4', img: `${STATIC_BASE}rug-4.jpg` },
-  { id: 5, title: 'Azure Flow', accent: 'ring-tuft-lime/50', blob: 'blob-squish-1', img: `${STATIC_BASE}rug-5.jpg` },
-];
-
-const Gallery = () => {
-  return (
-    <section className="shrink-0 bg-soft-bg">
-      <div className="relative px-6 pb-24 pt-6">
-        <ScatteredLittleFlowers spots={galleryLittleFlowers} />
-
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-16 flex flex-col justify-between gap-8 md:flex-row md:items-end">
-            <div>
-              <h2 className="mb-4 font-sans text-4xl text-stone-900 md:text-5xl">Latest Creations</h2>
-              <p className="max-w-sm font-sans text-stone-600">
-                Every piece is slow-made, ensuring the highest quality texture and detail.
-              </p>
-            </div>
-            <div className="inline-flex items-center rounded-sm border-2 border-stone-900 bg-white px-5 py-2.5 font-sans text-[10px] font-normal uppercase tracking-[0.28em] text-stone-900 shadow-[3px_3px_0_0_#0f0f0f] md:text-xs">
-              Est. 2024
-            </div>
-          </div>
-
-          <div className="grid gap-14 md:grid-cols-2 lg:grid-cols-3">
-            {galleryItems.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="cursor-pointer"
-              >
-                <div
-                  className={`blob-inflate relative mb-6 aspect-[4/5] overflow-hidden ring-4 ${item.blob} ${item.accent} transition-shadow duration-500`}
-                >
-                  <img
-                    src={item.img}
-                    alt={item.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <h3 className="mb-1 font-sans text-2xl text-stone-900">{item.title}</h3>
-                <p className="font-sans text-sm font-semibold uppercase tracking-widest text-stone-400">
-                  Tufted Wall Hanging
-                </p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
@@ -459,28 +446,339 @@ const Contact = ({ id }: { id: string }) => {
   );
 };
 
-function SiteFooter() {
+const legalLinkClass =
+  'font-bold text-tuft-teal underline decoration-tuft-teal/40 underline-offset-2 hover:decoration-tuft-teal';
+
+function InfoModal({
+  open,
+  onClose,
+  title,
+  titleId,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  titleId: string;
+  children: React.ReactNode;
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (event.key !== 'Tab' || !panelRef.current) return;
+
+      const items = [
+        ...panelRef.current.querySelectorAll('a[href], button:not([disabled])'),
+      ] as HTMLElement[];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus();
+    };
+  }, [open, onClose]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[80] flex items-end justify-center p-4 sm:items-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <button
+            type="button"
+            aria-label={`Close ${title.toLowerCase()} window`}
+            className="absolute inset-0 bg-stone-900/40"
+            onClick={onClose}
+          />
+          <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="relative z-[1] max-h-[min(36rem,calc(100vh-2rem))] w-full max-w-lg overflow-y-auto rounded-sm border-2 border-stone-900 bg-white p-6 shadow-[6px_6px_0_0_#0f0f0f] sm:p-8"
+          >
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <h2 id={titleId} className="font-sans text-2xl text-stone-900 md:text-3xl">
+                {title}
+              </h2>
+              <button
+                ref={closeRef}
+                type="button"
+                onClick={onClose}
+                className="rounded-sm border-2 border-stone-900 bg-white p-1.5 text-stone-900 shadow-[2px_2px_0_0_#0f0f0f] transition-[transform,box-shadow] hover:bg-soft-bg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                aria-label="Close"
+              >
+                <X size={16} strokeWidth={2.5} aria-hidden />
+              </button>
+            </div>
+
+            {children}
+
+            <p className="mt-8 text-xs font-bold uppercase tracking-widest text-stone-400">
+              Updated August 2026
+            </p>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-6 w-full cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-teal py-3 font-sans text-sm font-normal uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-110 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none"
+            >
+              Got it
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function PrivacyModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  return (
+    <InfoModal open={open} onClose={onClose} title="Privacy" titleId="privacy-title">
+      <p className="mb-8 font-sans text-base leading-relaxed text-stone-600">
+        This is a small studio site. I only see what you send me so I can reply about a piece.
+      </p>
+
+      <div className="space-y-6 font-sans">
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            What I collect
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Name, email, and your message — from the contact form, email, or Instagram DMs.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            What I don&apos;t do
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            No cookies, no trackers, no ads. I don&apos;t sell your info.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            Instagram
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Tapping{' '}
+            <a href="https://instagram.com/pinesmakes" target="_blank" rel="noreferrer" className={legalLinkClass}>
+              @pinesmakes
+            </a>{' '}
+            takes you off this site. Instagram has its own privacy rules.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            Keeping &amp; deleting
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            I keep messages while we&apos;re talking about a piece. Want something gone? Email{' '}
+            <a href="mailto:pinesmakes@gmail.com" className={legalLinkClass}>
+              pinesmakes@gmail.com
+            </a>
+            .
+          </p>
+        </section>
+      </div>
+    </InfoModal>
+  );
+}
+
+function TermsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  return (
+    <InfoModal open={open} onClose={onClose} title="Terms" titleId="terms-title">
+      <p className="mb-8 font-sans text-base leading-relaxed text-stone-600">
+        This site is for looking at my work and getting in touch. Sending a message isn&apos;t an
+        order.
+      </p>
+
+      <div className="space-y-6 font-sans">
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            The site
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Pines Makes is a small studio. Use this site to browse pieces and start a conversation
+            — not to place an automatic order.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            One of a kind
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Everything is handmade, so no two pieces are alike. Gallery photos are examples; a
+            piece may already be sold, and color, size, or texture can differ a little in real
+            life.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            Custom work
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Price, timing, and details get agreed by email or Instagram before I start. A form
+            message or DM is just the beginning of that chat.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            Photos &amp; designs
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            The photos and designs are mine. You&apos;re welcome to share the site; please don&apos;t
+            copy a piece to sell or treat the images as yours.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            Questions
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Email{' '}
+            <a href="mailto:pinesmakes@gmail.com" className={legalLinkClass}>
+              pinesmakes@gmail.com
+            </a>
+            .
+          </p>
+        </section>
+      </div>
+    </InfoModal>
+  );
+}
+
+function ShippingModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  return (
+    <InfoModal open={open} onClose={onClose} title="Shipping" titleId="shipping-title">
+      <p className="mb-8 font-sans text-base leading-relaxed text-stone-600">
+        I pack and send each piece once we&apos;ve agreed on it — there&apos;s no automatic checkout
+        shipping.
+      </p>
+
+      <div className="space-y-6 font-sans">
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            How it works
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Shipping is arranged after we agree on a piece. You&apos;ll get an estimate before
+            anything is sent.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            Timing
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Custom work ships when it&apos;s finished, not on a fixed clock. A ready gallery piece
+            can go sooner.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            Packing
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Each piece is packed to travel — rugs rolled, smaller work boxed. Mirrors get extra
+            care.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            Where &amp; cost
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Tell me where you are and I&apos;ll check. Cost depends on size, weight, and destination
+            — I&apos;ll confirm it with you before you pay.
+          </p>
+        </section>
+        <section>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+            If something arrives hurt
+          </h3>
+          <p className="text-sm leading-relaxed text-stone-800">
+            Email photos to{' '}
+            <a href="mailto:pinesmakes@gmail.com" className={legalLinkClass}>
+              pinesmakes@gmail.com
+            </a>{' '}
+            and I&apos;ll help make it right. I&apos;ll share a tracking number when there is one.
+          </p>
+        </section>
+      </div>
+    </InfoModal>
+  );
+}
+
+const footerLinkClass = 'cursor-pointer uppercase transition-colors hover:text-tuft-teal';
+
+function SiteFooter({
+  onPrivacyClick,
+  onTermsClick,
+  onShippingClick,
+}: {
+  onPrivacyClick: () => void;
+  onTermsClick: () => void;
+  onShippingClick: () => void;
+}) {
   return (
     <footer className="relative z-[1] mx-auto overflow-hidden border-t border-tuft-magenta/10 px-6 py-12 text-sm text-stone-500 font-sans">
       <ScatteredLittleFlowers spots={footerLittleFlowers} />
       <div className="relative z-[2] mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 md:flex-row">
         <img
-          src={`${STATIC_BASE}font-2.png`}
+          src={`${STATIC_BASE}${encodeURIComponent('transparent logo.png')}`}
           alt="Pines Makes"
-          className="h-10 w-auto object-contain md:h-11"
+          className="h-44 w-auto object-contain md:h-56"
           width={1024}
           height={1024}
         />
         <div className="flex gap-8 text-xs font-bold tracking-widest uppercase">
-          <a href="#" className="transition-colors hover:text-tuft-teal">
+          <button type="button" onClick={onPrivacyClick} className={footerLinkClass}>
             Privacy
-          </a>
-          <a href="#" className="transition-colors hover:text-tuft-teal">
+          </button>
+          <button type="button" onClick={onTermsClick} className={footerLinkClass}>
             Terms
-          </a>
-          <a href="#" className="transition-colors hover:text-tuft-teal">
+          </button>
+          <button type="button" onClick={onShippingClick} className={footerLinkClass}>
             Shipping
-          </a>
+          </button>
         </div>
         <div className="text-center md:text-right">© 2026 PINES MAKES STUDIO. ALL RIGHTS RESERVED.</div>
       </div>
@@ -505,6 +803,8 @@ function ScrollToTop() {
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [legalWindow, setLegalWindow] = useState<'privacy' | 'terms' | 'shipping' | null>(null);
+  const closeLegal = useCallback(() => setLegalWindow(null), []);
 
   const scrollToContact = () => {
     if (location.pathname === '/') {
@@ -522,7 +822,14 @@ function AppLayout() {
       <GroovyWaveBackground />
       <Navbar onContactClick={scrollToContact} />
       <Outlet />
-      <SiteFooter />
+      <SiteFooter
+        onPrivacyClick={() => setLegalWindow('privacy')}
+        onTermsClick={() => setLegalWindow('terms')}
+        onShippingClick={() => setLegalWindow('shipping')}
+      />
+      <PrivacyModal open={legalWindow === 'privacy'} onClose={closeLegal} />
+      <TermsModal open={legalWindow === 'terms'} onClose={closeLegal} />
+      <ShippingModal open={legalWindow === 'shipping'} onClose={closeLegal} />
     </div>
   );
 }
@@ -542,8 +849,6 @@ function HomePage() {
   return (
     <main className="relative z-[1]">
       <Hero />
-      <HeroToGalleryWave />
-      <Gallery />
       <div className="bg-white">
         <WaveDivider className="text-tuft-teal" />
       </div>
