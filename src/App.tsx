@@ -76,25 +76,6 @@ function HeroCascadeShowcase() {
           className="w-full"
         />
       </div>
-
-      <div className="relative z-20 mt-12 sm:mt-14">
-        <div className="relative left-1/2 flex w-[185%] -translate-x-1/2 gap-10 sm:gap-16">
-          <div className="min-w-0 flex-1 rotate-[4deg] -translate-x-3 sm:-translate-x-4">
-            <HeroPieceImage
-              src={publicAsset('Flower Dream detail.jpg')}
-              alt="Flower Dream detail"
-              className="w-full"
-            />
-          </div>
-          <div className="min-w-0 flex-1 rotate-[-5deg] translate-x-3 sm:translate-x-4">
-            <HeroPieceImage
-              src={publicAsset('Retro darkness.jpg')}
-              alt="Retro Darkness"
-              className="w-full"
-            />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

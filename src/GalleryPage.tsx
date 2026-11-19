@@ -15,7 +15,7 @@ type GalleryItem = {
   title: string;
   subtitle: string;
   dimensions?: string;
-  material?: string;
+  material?: string | string[];
   accent: string;
   blob: string;
   images: string[];
@@ -27,7 +27,11 @@ const galleryPageItems: GalleryItem[] = [
     title: 'Flower Dream',
     subtitle: 'Tufted Wall Hanging',
     dimensions: '71cm × 51cm',
-    material: 'Acrylic and wool blend',
+    material: [
+      'Acrylic and wool blend',
+      'Handmade wood frame',
+      '£350 + delivery (to be calculated)',
+    ],
     accent: 'ring-tuft-yellow/60',
     blob: 'blob-squish-1',
     images: ['Flower Dream 1.jpg', 'Flower Dream detail.jpg'],
@@ -36,14 +40,18 @@ const galleryPageItems: GalleryItem[] = [
     id: 2,
     title: 'Happy Mirror',
     subtitle: 'Tufted Wall Mirror',
+    dimensions: '30cm × 30cm',
+    material: ['Premium acrylic', '£40 SOLD'],
     accent: 'ring-tuft-magenta/50',
     blob: 'blob-squish-2',
-    images: ['Happy mirror.jpg', 'Happy mirror 2.jpg', 'Happy mirror detail.jpg'],
+    images: ['Happy mirror.jpg', 'Happy mirror detail.jpg'],
   },
   {
     id: 3,
     title: 'Love Waves',
     subtitle: 'Floor Rug',
+    dimensions: '70cm × 70cm',
+    material: ['Premium acrylic', '£175 SOLD'],
     accent: 'ring-tuft-orange/50',
     blob: 'blob-squish-3',
     images: ['Love waves 1.jpg'],
@@ -52,6 +60,8 @@ const galleryPageItems: GalleryItem[] = [
     id: 4,
     title: 'Retro Darkness',
     subtitle: 'Floor Rug',
+    dimensions: '65cm × 60cm',
+    material: ['Premium acrylic', '£125 SOLD'],
     accent: 'ring-tuft-teal/50',
     blob: 'blob-squish-4',
     images: ['Retro darkness.jpg'],
@@ -196,7 +206,11 @@ function GalleryCardBody({
                   <dt className="mb-1 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
                     Material
                   </dt>
-                  <dd className="text-lg leading-relaxed text-stone-800">{item.material}</dd>
+                  <dd className="space-y-1 text-lg leading-relaxed text-stone-800">
+                    {(Array.isArray(item.material) ? item.material : [item.material]).map((line) => (
+                      <p key={line}>{line}</p>
+                    ))}
+                  </dd>
                 </div>
               )}
             </dl>
