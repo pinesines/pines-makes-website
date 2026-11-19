@@ -833,6 +833,29 @@ function AppLayout() {
   );
 }
 
+function PinesMakesMarquee({ edge }: { edge: 'top' | 'bottom' }) {
+  return (
+    <div
+      className={`pointer-events-none absolute inset-x-0 z-0 flex h-[8.5rem] items-center justify-center ${
+        edge === 'top' ? 'top-0' : 'bottom-0'
+      }`}
+      aria-hidden
+    >
+      <motion.div
+        animate={{ x: edge === 'top' ? [-1200, 0] : [0, -1200] }}
+        transition={{ duration: 130, repeat: Infinity, ease: 'linear' }}
+        className="flex gap-24 whitespace-nowrap opacity-30"
+      >
+        {[...Array(12)].map((_, i) => (
+          <span key={i} className="font-sans text-7xl text-black uppercase md:text-8xl">
+            PINES MAKES • PINES MAKES •
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
 function HomePage() {
   useEffect(() => {
     if (sessionStorage.getItem('scrollToContact') !== '1') {
@@ -850,22 +873,13 @@ function HomePage() {
       <Hero />
       <WaveDivider className="text-tuft-lilac" />
       <section className="relative overflow-hidden bg-tuft-lilac px-6 py-24 text-center">
-        <motion.div
-          animate={{ x: [-1200, 0] }}
-          transition={{ duration: 130, repeat: Infinity, ease: 'linear' }}
-          className="pointer-events-none flex gap-24 whitespace-nowrap opacity-[0.12]"
-        >
-          {[...Array(12)].map((_, i) => (
-            <span key={i} className="font-sans text-8xl text-tuft-lime uppercase md:text-9xl">
-              PINES MAKES • PINES MAKES •
-            </span>
-          ))}
-        </motion.div>
+        <PinesMakesMarquee edge="top" />
+        <PinesMakesMarquee edge="bottom" />
         <ScatteredLittleFlowers spots={tealBannerLittleFlowers} />
         <div className="relative z-10 mx-auto max-w-3xl py-10">
           <div className="grid gap-6 font-sans md:grid-cols-2">
             <div className="blob-inflate blob-squish-2 rounded-[2rem] bg-groovy-pink p-8 transition-transform hover:scale-[1.02]">
-              <Instagram className="mx-auto mb-4 text-tuft-orange" size={32} />
+              <Instagram className="mx-auto mb-4 text-black" size={32} />
               <h3 className="mb-2 font-sans text-xl text-stone-900">Instagram</h3>
               <p className="mb-4 text-sm text-stone-700">DM for commissions</p>
               <a
