@@ -331,7 +331,7 @@ const Hero = () => {
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/gallery"
-                className="group flex cursor-pointer items-center gap-2 rounded-sm border-2 border-stone-900 bg-tuft-teal px-7 py-3 font-sans text-sm font-normal uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-110 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none md:px-8 md:text-[15px]"
+                className="group flex cursor-pointer items-center gap-2 rounded-sm border-2 border-stone-900 bg-tuft-lilac px-7 py-3 font-sans text-sm font-normal uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-110 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none md:px-8 md:text-[15px]"
               >
                 View Collection
                 <ArrowRight size={18} strokeWidth={2.5} className="transition-transform group-hover:translate-x-1" />
@@ -357,7 +357,7 @@ const Contact = ({ id }: { id: string }) => {
   return (
     <section
       id={id}
-      className="relative overflow-hidden bg-gradient-to-b from-tuft-yellow/40 via-tuft-yellow/20 to-soft-bg px-6 py-28"
+      className="relative overflow-hidden px-6 py-28"
     >
       <ScatteredLittleFlowers spots={contactLittleFlowers} />
 
@@ -371,6 +371,7 @@ const Contact = ({ id }: { id: string }) => {
           <BubbleDisplayTitle
             text="Work with me"
             as="h2"
+            letterClassName="text-groovy-pink"
             className="hero-bubble-section-title mb-8 text-4xl sm:text-5xl md:text-6xl lg:text-[3.65rem]"
           />
           <p className="mb-12 font-sans text-xl text-stone-600">
@@ -416,7 +417,7 @@ const Contact = ({ id }: { id: string }) => {
             </div>
             <button
               type="submit"
-              className="w-full cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-magenta py-4 font-sans text-base font-normal uppercase tracking-[0.16em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-105 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none md:py-5 md:text-lg"
+              className="w-full cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-lilac py-4 font-sans text-base font-normal uppercase tracking-[0.16em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-105 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none md:py-5 md:text-lg"
             >
               Send Message
             </button>
@@ -428,7 +429,7 @@ const Contact = ({ id }: { id: string }) => {
 };
 
 const legalLinkClass =
-  'font-bold text-tuft-teal underline decoration-tuft-teal/40 underline-offset-2 hover:decoration-tuft-teal';
+  'font-bold text-groovy-pink underline decoration-groovy-pink/40 underline-offset-2 hover:decoration-groovy-pink';
 
 function InfoModal({
   open,
@@ -539,7 +540,7 @@ function InfoModal({
             <button
               type="button"
               onClick={onClose}
-              className="mt-6 w-full cursor-pointer rounded-sm border-2 border-stone-900 bg-tuft-teal py-3 font-sans text-sm font-normal uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-110 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none"
+              className="mt-6 w-full cursor-pointer rounded-sm border-2 border-stone-900 bg-groovy-pink py-3 font-sans text-sm font-normal uppercase tracking-[0.2em] text-white shadow-[4px_4px_0_0_#0f0f0f] transition-[transform,box-shadow,filter] hover:brightness-95 hover:shadow-[3px_3px_0_0_#0f0f0f] active:translate-x-1 active:translate-y-1 active:shadow-none"
             >
               Got it
             </button>
@@ -831,9 +832,9 @@ function HomePage() {
     <main className="relative z-[1]">
       <Hero />
       <div className="bg-white">
-        <WaveDivider className="text-tuft-teal" />
+        <WaveDivider className="text-tuft-lilac" />
       </div>
-      <section className="relative overflow-hidden bg-tuft-teal px-6 py-24 text-center">
+      <section className="relative overflow-hidden bg-tuft-lilac px-6 py-24 text-center">
         <motion.div
           animate={{ x: [-1200, 0] }}
           transition={{ duration: 130, repeat: Infinity, ease: 'linear' }}
@@ -848,7 +849,7 @@ function HomePage() {
         <ScatteredLittleFlowers spots={tealBannerLittleFlowers} />
         <div className="relative z-10 mx-auto max-w-3xl py-10">
           <div className="grid gap-6 font-sans md:grid-cols-2">
-            <div className="blob-inflate blob-squish-2 rounded-[2rem] bg-tuft-yellow p-8 transition-transform hover:scale-[1.02]">
+            <div className="blob-inflate blob-squish-2 rounded-[2rem] bg-groovy-pink p-8 transition-transform hover:scale-[1.02]">
               <Instagram className="mx-auto mb-4 text-tuft-orange" size={32} />
               <h3 className="mb-2 font-sans text-xl text-stone-900">Instagram</h3>
               <p className="mb-4 text-sm text-stone-700">DM for commissions</p>
@@ -856,18 +857,18 @@ function HomePage() {
                 href="https://instagram.com/pinesmakes"
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs font-bold tracking-widest text-tuft-teal uppercase hover:underline"
+                className="text-xs font-bold tracking-widest text-stone-900 uppercase hover:underline"
               >
                 @pinesmakes
               </a>
             </div>
-            <div className="blob-inflate blob-squish-3 rounded-[2rem] bg-tuft-lime/60 p-8 transition-transform hover:scale-[1.02]">
-              <Mail className="mx-auto mb-4 text-tuft-teal" size={32} />
+            <div className="blob-inflate blob-squish-3 rounded-[2rem] bg-groovy-pink p-8 transition-transform hover:scale-[1.02]">
+              <Mail className="mx-auto mb-4 text-stone-900" size={32} />
               <h3 className="mb-2 font-sans text-xl text-stone-900">Email</h3>
               <p className="mb-4 text-sm text-stone-700">Let&apos;s chat about art</p>
               <a
                 href="mailto:pinesmakes@gmail.com"
-                className="text-xs font-bold tracking-widest text-tuft-teal uppercase hover:underline"
+                className="text-xs font-bold tracking-widest text-stone-900 uppercase hover:underline"
               >
                 pinesmakes@gmail.com
               </a>
@@ -875,7 +876,7 @@ function HomePage() {
           </div>
         </div>
       </section>
-      <div className="bg-tuft-teal">
+      <div className="bg-tuft-lilac">
         <WaveDivider className="text-soft-bg" />
       </div>
       <Contact id="contact-section" />
