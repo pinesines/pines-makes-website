@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { X } from 'lucide-react';
 import { ScatteredLittleFlowers } from './decorations';
+import { SkeletonImage } from './SkeletonImage';
 
 /** Vite base path — `'/'` in dev, `'/pines-makes-website/'` in production Pages build */
 const STATIC_BASE = import.meta.env.BASE_URL;
@@ -139,10 +140,12 @@ function GalleryCardBody({
           <div
             className={`blob-inflate relative mb-6 aspect-[4/5] overflow-hidden ring-4 ${item.blob} ${item.accent} transition-shadow duration-200 group-hover:shadow-[0_20px_44px_-18px_rgb(45_30_50_0.22)]`}
           >
-            <img
+            <SkeletonImage
+              fill
               src={publicAsset(displayedImage)}
               alt={item.title}
               className="h-full w-full object-cover"
+              loading="lazy"
             />
           </div>
         </button>
@@ -164,106 +167,118 @@ function GalleryCardBody({
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <div className="grid items-start gap-10 md:grid-cols-2 md:gap-12 lg:gap-16">
+      <div className="grid items-start gap-10 md:grid-cols-2 md:items-stretch md:gap-12 lg:gap-16">
         <button
           type="button"
           aria-expanded
           onClick={() => onSelect(item.id)}
-          className="group w-full cursor-pointer text-left"
+          className="group w-full cursor-pointer self-start text-left"
         >
           <div
             className={`blob-inflate relative aspect-[4/5] w-full max-w-lg overflow-hidden ring-4 ${item.blob} ${item.accent} shadow-[0_28px_60px_-20px_rgb(45_30_50_0.28)] transition-shadow duration-200 md:max-w-none`}
           >
-            <img
+            <SkeletonImage
+              fill
               src={publicAsset(displayedImage)}
               alt={item.title}
               className="h-full w-full object-cover"
+              loading="eager"
+              fetchPriority="high"
             />
-            <span className="absolute right-3 top-3 rounded-sm border-2 border-stone-900 bg-white/90 p-1.5 text-stone-900 shadow-[2px_2px_0_0_#0f0f0f]">
+            <span className="absolute right-3 top-3 z-10 rounded-sm border-2 border-stone-900 bg-white/90 p-1.5 text-stone-900 shadow-[2px_2px_0_0_#0f0f0f]">
               <X size={16} strokeWidth={2.5} aria-hidden />
             </span>
           </div>
         </button>
 
-        <div className="text-left md:pt-6">
-          <h2 className="mb-2 font-sans text-3xl text-stone-900 md:text-4xl">{item.title}</h2>
-          <p className="mb-8 font-sans text-sm font-semibold uppercase tracking-widest text-stone-400">
-            {item.subtitle}
-          </p>
+        {/* On wide screens the copy is pulled out of flow so this column matches the
+            photo height, and the variations sit in the space under the text. */}
+        <div className="relative min-w-0 text-left">
+          <div className="flex flex-col gap-10 md:absolute md:inset-0 md:min-h-0 md:gap-0">
+            <div className="md:shrink-0 md:pt-3">
+              <h2 className="mb-2 font-sans text-3xl text-stone-900 md:text-4xl">{item.title}</h2>
+              <p className="mb-8 font-sans text-sm font-semibold uppercase tracking-widest text-stone-400 md:mb-5">
+                {item.subtitle}
+              </p>
 
-          {hasDetails && (
-            <dl className="space-y-5 font-sans">
-              {item.dimensions && (
-                <div>
-                  <dt className="mb-1 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
-                    Dimensions
-                  </dt>
-                  <dd className="text-lg text-stone-800">{item.dimensions}</dd>
-                </div>
+              {hasDetails && (
+                <dl className="space-y-5 font-sans md:space-y-4">
+                  {item.dimensions && (
+                    <div>
+                      <dt className="mb-1 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+                        Dimensions
+                      </dt>
+                      <dd className="text-lg text-stone-800">{item.dimensions}</dd>
+                    </div>
+                  )}
+                  {item.material && (
+                    <div>
+                      <dt className="mb-1 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
+                        Material
+                      </dt>
+                      <dd className="space-y-1 text-lg leading-relaxed text-stone-800">
+                        {(Array.isArray(item.material) ? item.material : [item.material]).map((line) => (
+                          <p key={line}>{line}</p>
+                        ))}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
               )}
-              {item.material && (
-                <div>
-                  <dt className="mb-1 text-xs font-bold uppercase tracking-[0.28em] text-stone-500">
-                    Material
-                  </dt>
-                  <dd className="space-y-1 text-lg leading-relaxed text-stone-800">
-                    {(Array.isArray(item.material) ? item.material : [item.material]).map((line) => (
-                      <p key={line}>{line}</p>
-                    ))}
-                  </dd>
+            </div>
+
+            {hasVariations && (
+              <div className="flex min-h-0 flex-col md:mt-auto md:flex-1 md:justify-end md:pt-3 md:[container-type:size]">
+                <p className="mb-3 shrink-0 text-center font-sans text-xs font-bold uppercase tracking-[0.28em] text-stone-500 md:text-left">
+                  Variations
+                </p>
+                <div className="flex flex-wrap items-end justify-center gap-4 md:flex-nowrap md:justify-start">
+                  {item.images.map((file, imageIndex) => {
+                    const isActive = imageIndex === activeImageIndex;
+                    return (
+                      <button
+                        key={file}
+                        type="button"
+                        aria-label={`${item.title} — ${variationLabel(file, imageIndex)}`}
+                        aria-pressed={isActive}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onActiveImageChange(imageIndex);
+                        }}
+                        className="w-24 cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tuft-teal focus-visible:ring-offset-2 sm:w-28 md:w-auto"
+                      >
+                        <div
+                          className={`blob-inflate blob-squish-1 relative aspect-[4/5] w-full overflow-hidden ring-4 transition-shadow duration-200 md:w-[min(7rem,calc((100cqw-2rem)/3),calc((100cqh-2.6rem)*0.8))] ${
+                            isActive
+                              ? `${item.accent} shadow-[0_16px_36px_-14px_rgb(45_30_50_0.28)]`
+                              : 'ring-stone-200 hover:ring-stone-300'
+                          }`}
+                        >
+                          <SkeletonImage
+                            fill
+                            src={publicAsset(file)}
+                            alt=""
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            fetchPriority="low"
+                          />
+                        </div>
+                        <span
+                          className={`mt-2 block shrink-0 text-center font-sans text-[10px] font-bold uppercase tracking-widest ${
+                            isActive ? 'text-stone-900' : 'text-stone-400'
+                          }`}
+                        >
+                          {variationLabel(file, imageIndex)}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-            </dl>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {hasVariations && (
-        <div className="mt-10 w-full">
-          <p className="mb-4 text-center font-sans text-xs font-bold uppercase tracking-[0.28em] text-stone-500 md:text-left">
-            Variations
-          </p>
-          <div className="mb-8 flex flex-wrap justify-center gap-4 md:justify-start">
-              {item.images.map((file, imageIndex) => {
-                const isActive = imageIndex === activeImageIndex;
-                return (
-                  <button
-                    key={file}
-                    type="button"
-                    aria-label={`${item.title} — ${variationLabel(file, imageIndex)}`}
-                    aria-pressed={isActive}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onActiveImageChange(imageIndex);
-                    }}
-                    className="cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tuft-teal focus-visible:ring-offset-2"
-                  >
-                    <div
-                      className={`blob-inflate blob-squish-1 relative aspect-[4/5] w-24 overflow-hidden ring-4 transition-shadow duration-200 sm:w-28 ${
-                        isActive
-                          ? `${item.accent} shadow-[0_16px_36px_-14px_rgb(45_30_50_0.28)]`
-                          : 'ring-stone-200 hover:ring-stone-300'
-                      }`}
-                    >
-                      <img
-                        src={publicAsset(file)}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <span
-                      className={`mt-2 block text-center font-sans text-[10px] font-bold uppercase tracking-widest ${
-                        isActive ? 'text-stone-900' : 'text-stone-400'
-                      }`}
-                    >
-                      {variationLabel(file, imageIndex)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
     </div>
   );
 }

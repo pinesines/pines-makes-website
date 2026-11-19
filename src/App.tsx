@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Instagram, Mail, ArrowRight, Menu, X } from 'lucide-react';
 import { BrowserRouter, Link, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { GalleryPage } from './GalleryPage';
+import { SkeletonImage } from './SkeletonImage';
 import { FLOWER_ACCENTS, ScatteredLittleFlowers, type FlowerSpot } from './decorations';
 import { GroovyWaveBackground } from './GroovyWaveBackground';
 
@@ -32,12 +33,15 @@ function HeroPieceImage({
         <div className="absolute -inset-3 -z-20 rounded-full bg-tuft-yellow/50" />
         <div className="absolute -inset-2 -z-10 rounded-full bg-tuft-lilac/25" />
         <div className="relative h-full w-full overflow-hidden rounded-full shadow-[0_28px_60px_-20px_rgb(45_30_50_0.22),0_12px_24px_-12px_rgb(45_30_50_0.12)] ring-4 ring-white/80">
-          <img
+          <SkeletonImage
+            fill
             src={src}
             alt={alt}
             className="h-full w-full object-cover"
             style={{ clipPath: 'circle(50% at 50% 50%)' }}
             id={id}
+            loading="eager"
+            fetchPriority="high"
           />
         </div>
       </div>
@@ -58,7 +62,15 @@ function HeroPieceImage({
         className="relative h-full w-full overflow-hidden shadow-[0_28px_60px_-20px_rgb(45_30_50_0.22),0_12px_24px_-12px_rgb(45_30_50_0.12)] ring-4 ring-white/80"
         style={{ borderRadius: '46% 54% 52% 48% / 44% 48% 52% 56%' }}
       >
-        <img src={src} alt={alt} className="h-full w-full object-cover" id={id} />
+        <SkeletonImage
+          fill
+          src={src}
+          alt={alt}
+          className="h-full w-full object-cover"
+          id={id}
+          loading="eager"
+          fetchPriority="high"
+        />
       </div>
     </div>
   );
@@ -301,12 +313,15 @@ const Hero = () => {
         className="relative z-[1] mb-10 flex justify-center px-4 md:mb-16"
       >
         <h1 className="w-full max-w-[16rem] sm:max-w-[18rem] md:max-w-[20rem] lg:max-w-[22rem]">
-          <img
+          <SkeletonImage
             src={`${STATIC_BASE}${encodeURIComponent('transparent logo.png')}`}
             alt="Pines Makes — Tufted Art"
+            frameClassName="block w-full"
             className="h-auto w-full object-contain"
             width={1024}
             height={1024}
+            loading="eager"
+            fetchPriority="high"
           />
         </h1>
       </motion.div>
@@ -744,12 +759,14 @@ function SiteFooter({
     <footer className="relative z-[1] mx-auto overflow-hidden px-6 pt-0 pb-12 text-sm text-stone-500 font-sans">
       <ScatteredLittleFlowers spots={footerLittleFlowers} />
       <div className="relative z-[2] mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 md:flex-row">
-        <img
+        <SkeletonImage
           src={`${STATIC_BASE}${encodeURIComponent('transparent logo.png')}`}
           alt="Pines Makes"
+          frameClassName="inline-block w-auto"
           className="h-44 w-auto object-contain md:h-56"
           width={1024}
           height={1024}
+          loading="lazy"
         />
         <div className="flex gap-8 text-xs font-bold tracking-widest uppercase">
           <button type="button" onClick={onPrivacyClick} className={footerLinkClass}>
