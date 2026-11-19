@@ -831,9 +831,7 @@ function HomePage() {
   return (
     <main className="relative z-[1]">
       <Hero />
-      <div className="bg-white">
-        <WaveDivider className="text-tuft-lilac" />
-      </div>
+      <WaveDivider className="text-tuft-lilac" />
       <section className="relative overflow-hidden bg-tuft-lilac px-6 py-24 text-center">
         <motion.div
           animate={{ x: [-1200, 0] }}
@@ -876,9 +874,7 @@ function HomePage() {
           </div>
         </div>
       </section>
-      <div className="bg-tuft-lilac">
-        <WaveDivider className="text-soft-bg" />
-      </div>
+      <WaveDivider flip className="text-tuft-lilac" />
       <Contact id="contact-section" />
     </main>
   );
