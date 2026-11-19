@@ -741,7 +741,7 @@ function SiteFooter({
   onShippingClick: () => void;
 }) {
   return (
-    <footer className="relative z-[1] mx-auto overflow-hidden border-t border-tuft-magenta/10 px-6 py-12 text-sm text-stone-500 font-sans">
+    <footer className="relative z-[1] mx-auto overflow-hidden px-6 pt-0 pb-12 text-sm text-stone-500 font-sans">
       <ScatteredLittleFlowers spots={footerLittleFlowers} />
       <div className="relative z-[2] mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 md:flex-row">
         <img
