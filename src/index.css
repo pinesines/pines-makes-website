@@ -118,3 +118,71 @@ body {
   @apply text-stone-800 antialiased;
   background-color: var(--color-groovy-cream);
 }
+
+/**
+ * Image placeholder — warm tuft palette, always in motion so a slow photo
+ * reads as loading rather than a frozen or broken frame.
+ * Two sheens, offset per image, so a grid never pulses in lockstep.
+ */
+.skeleton-shimmer {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background-color: #ffb088;
+  animation: skeleton-breathe 1.6s ease-in-out infinite;
+}
+
+.skeleton-shimmer__sheen {
+  position: absolute;
+  top: -15%;
+  bottom: -15%;
+  left: 0;
+  width: 70%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 248, 236, 0.15) 28%,
+    rgba(255, 255, 255, 0.92) 44%,
+    rgba(255, 221, 46, 0.95) 52%,
+    rgba(255, 198, 173, 0.85) 60%,
+    rgba(255, 119, 192, 0.55) 72%,
+    transparent 100%
+  );
+  transform: translateX(-130%);
+  animation: skeleton-sheen 1.2s linear infinite;
+  will-change: transform;
+}
+
+@keyframes skeleton-sheen {
+  0% {
+    transform: translateX(-140%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+@keyframes skeleton-breathe {
+  0%,
+  100% {
+    background-color: #ffb088;
+  }
+  50% {
+    background-color: #ffd4ae;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: skeleton-breathe 2.4s ease-in-out infinite;
+  }
+
+  .skeleton-shimmer__sheen {
+    animation: none;
+    opacity: 0.4;
+    transform: translateX(30%);
+    will-change: auto;
+  }
+}
